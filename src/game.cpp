@@ -84,6 +84,17 @@ bool HandleEvents(Arena* arena, SDL_Event& event) {
 }
 
 void Update(GameData* data, float dt) {
+    //Check input to enter edit mode
+    if (KeyPressed(&data->input, SDL_SCANCODE_F2)) {
+        data->edit_level = !data->edit_level;
+    }
+
+    //Update level editor
+    if (data->edit_level) {
+        EDITOR::Update(&data->editorData, &data->input, data->GetCurrentLevel());
+    }
+
+    //Check input to undo/redo
     if (KeyPressed(&data->input, SDL_SCANCODE_Z) || KeyHeld_ForTime(&data->input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME)) {
         ResetKeyHeldTime(&data->input, SDL_SCANCODE_Z);
         if (KeyHeld(&data->input, SDL_SCANCODE_LSHIFT)) {
@@ -92,6 +103,8 @@ void Update(GameData* data, float dt) {
             Undo(data->commandBuffer);
         }
     }
+
+    //Check input for movement
     if (KeyPressed(&data->input, SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(&data->input, SDL_SCANCODE_RIGHT,
                                                                         (1 / MOVE_SPEED) * 1.15)) {
         ResetKeyHeldTime(&data->input, SDL_SCANCODE_RIGHT);
@@ -110,6 +123,7 @@ void Update(GameData* data, float dt) {
         data->input_buffer[data->input_buffer_write_count++ % data->input_buffer_capacity] = {0, 1};
     }
 
+    //Update movable entities
     bool are_entities_moving = false;
     for (int i = 0; i < data->GetCurrentLevel()->entityCount; i++) {
         Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
@@ -126,6 +140,7 @@ void Update(GameData* data, float dt) {
         }
     }
 
+    //Update player movement
     if (are_entities_moving == false && data->input_buffer_read_count < data->input_buffer_write_count) {
         data->command_timestamp += 1;
 

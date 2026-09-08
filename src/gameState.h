@@ -6,7 +6,10 @@
 #include "command.h"
 #include <imgui.h>
 
+#include "levelEditor.h"
+
 struct GameData {
+    bool edit_level;
     int levelCount;
     int currentLevel;
     int input_buffer_capacity;
@@ -15,6 +18,7 @@ struct GameData {
     const float* dt;
     uint32_t command_timestamp;
 
+    Editor editorData;
     Sprite* spriteBuffer;
     Arena* arena_entities;
     Arena* arena_commands;
