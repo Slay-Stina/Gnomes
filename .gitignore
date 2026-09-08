@@ -1,0 +1,18 @@
+# Bygg
+/build/
+/cmake-build-*/
+/cmake-build-debug/
+
+# IDE
+/.idea/
+*.iml
+
+# clangd / compile database (genereras av build)
+compile_commands.json
+
+# Temp / backup
+CMakeLists.txt.bak*
+temp_state.bin
+
+# OS
+.DS_Store

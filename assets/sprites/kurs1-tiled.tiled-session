@@ -1,0 +1,28 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "tiles.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.exportedFilePath": "/home/jah/Projects/kurs1/assets/levels",
+    "last.imagePath": "/home/jah/Projects/kurs1/assets/sprites",
+    "map.height": 10,
+    "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 20,
+    "openFiles": [
+    ],
+    "project": "kurs1-tiled.tiled-project",
+    "recentFiles": [
+        "tiles.tsx"
+    ],
+    "tileset.lastUsedExportFilter": "JSON tileset files (*.tsj *.json)",
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.type": 1
+}

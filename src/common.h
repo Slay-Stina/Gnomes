@@ -1,0 +1,20 @@
+#pragma once
+
+#include <cstddef>
+
+#define KILOBYTES(n) ((size_t) n * 1024)
+#define MEGABYTES(n) (KILOBYTES(n) * 1024)
+#define GIGABYTES(n) (MEGABYTES(n) * 1024)
+
+constexpr size_t GAME_MEMORY_ALLOWANCE = MEGABYTES(10);
+
+constexpr int TARGET_FPS = 60;
+const double FRAME_TIME_MS = 1000.0 / TARGET_FPS;
+
+const int SCREEN_WIDTH = 650;
+const int SCREEN_HEIGHT = 400;
+const int UPSCALE_FACTOR = 1;
+const int CELL_SIZE_PX = 32 * UPSCALE_FACTOR;
+
+const float MOVE_SPEED = 6.0;
+const float UNDO_REPEAT_TIME = 0.15;

@@ -1,0 +1,66 @@
+#include "spriteLibrary.h"
+
+#include "arena.h"
+
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+#include <cassert>
+#include <string>
+
+using namespace std;
+
+const char* FALLBACK_PATH = "assets/sprites/fallback.png";
+
+static const SpriteDataEntry all_sprite_data[] = {
+        {SPRITE_ID::Fallback, FALLBACK_PATH},
+        {SPRITE_ID::Wall, "assets/sprites/wall.png"},
+        {SPRITE_ID::Gnome, "assets/sprites/player.png"},
+        {SPRITE_ID::Rock, "assets/sprites/box.png"},
+        {SPRITE_ID::Ground, "assets/sprites/ground.png"},
+        {SPRITE_ID::Medusa, "assets/sprites/medusa.png"},
+};
+
+Sprite* GetSpriteFromID(ID id, Sprite* spriteBuffer) {
+    switch (id) {
+        case ID::NONE:
+            return nullptr;
+        case ID::GROUND:
+            return &spriteBuffer[(int) SPRITE_ID::Ground];
+        case ID::WALL:
+            return &spriteBuffer[(int) SPRITE_ID::Wall];
+        case ID::GNOME:
+            return &spriteBuffer[(int) SPRITE_ID::Gnome];
+        case ID::ROCK:
+            return &spriteBuffer[(int) SPRITE_ID::Rock];
+        case ID::MEDUSA:
+            return &spriteBuffer[(int) SPRITE_ID::Medusa];
+        case ID::GHOST:
+            return &spriteBuffer[(int) SPRITE_ID::Ghost];
+        case ID::GOLEM:
+            return &spriteBuffer[(int) SPRITE_ID::Golem];
+        default:
+            return &spriteBuffer[(int) SPRITE_ID::Fallback];
+    }
+}
+
+namespace AssetManagement {
+    void LoadAllSprites(Sprite* spriteBuffer, SDL_Renderer* renderer) {
+        for (SpriteDataEntry entry: all_sprite_data) {
+            LoadSprite(spriteBuffer, entry, renderer);
+        }
+    }
+
+    void LoadSprite(Sprite* spriteBuffer, SpriteDataEntry entry, SDL_Renderer* renderer) {
+        SDL_Surface* surface = IMG_Load(entry.path);
+        if (surface == nullptr) {
+            surface = IMG_Load(FALLBACK_PATH);
+        }
+        assert(surface != nullptr);
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+        Sprite* sprite = &spriteBuffer[(int) entry.id];
+        sprite->texture = texture;
+        sprite->height = texture->h;
+        sprite->width = texture->w;
+        SDL_DestroySurface(surface);
+    }
+}
