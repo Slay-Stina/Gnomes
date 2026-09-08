@@ -168,11 +168,12 @@ int main() {
     size_t COMMAND_SIZE = sizeof(AnyCommand) * gameData->commandBuffer->capacity;
     gameData->commandBuffer->allCommands = (AnyCommand*) Allocate(gameData->arena_commands, COMMAND_SIZE);
 
-    //Input memory
+    //Input buffer memory
     gameData->input_buffer_capacity = 50;
     size_t RING_BUFFER_SIZE = sizeof(Position) * gameData->input_buffer_capacity;
     gameData->input_buffer = (Position*) Allocate(gameData->arena_levels, RING_BUFFER_SIZE);
 
+    //Input management memory
     size_t INPUT_ARENA_SIZE = 0;
     INPUT_ARENA_SIZE += sizeof(bool) * SDL_SCANCODE_COUNT * 2;
     INPUT_ARENA_SIZE += sizeof(float) * SDL_SCANCODE_COUNT;
@@ -180,8 +181,8 @@ int main() {
     gameData->arena_input = CreateSubArena(arena_main, INPUT_ARENA_SIZE);
     gameData->input.keys_current = (bool*) Allocate(gameData->arena_input, sizeof(bool) * SDL_SCANCODE_COUNT);
     gameData->input.keys_previous = (bool*) Allocate(gameData->arena_input, sizeof(bool) * SDL_SCANCODE_COUNT);
-    gameData->input.keys_held_time = (float*) Allocate(gameData->arena_input,
-                                                       sizeof(float) * SDL_SCANCODE_COUNT);
+    gameData->input.keys_held_time = (float*) Allocate(gameData->arena_input, sizeof(float) * SDL_SCANCODE_COUNT);
+    gameData->input.mouse_held_time = (float*) Allocate(gameData->arena_input, sizeof(float) * MOUSE_BUTTON_COUNT);
 
     DLL_INFO dll;
 
@@ -208,8 +209,10 @@ int main() {
         }
 
         gameData->input.keys_current = SDL_GetKeyboardState(nullptr);
+        gameData->input.mouse_current = SDL_GetMouseState(&gameData->input.mouse_x, &gameData->input.mouse_y);
         dll.Update(gameData, dt);
         UpdateKeys(&gameData->input, dt);
+        UpdateMouse(&gameData->input, dt);
         dll.Draw(gameData, renderer);
 
         double time_to_sleep_ms;
