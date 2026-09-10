@@ -21,8 +21,12 @@ namespace EDITOR {
             editor->object_to_place_id = ID::ROCK;
         }
         ImGui::SameLine();
-        if (ImGui::ImageButton("Gnome", GetSpriteFromID(ID::GNOME, spriteBuffer)->texture, size)) {
-            editor->object_to_place_id = ID::GNOME;
+        if (ImGui::ImageButton("Demon", GetSpriteFromID(ID::DEMON, spriteBuffer)->texture, size)) {
+            editor->object_to_place_id = ID::DEMON;
+        }
+        ImGui::SameLine();
+        if (ImGui::ImageButton("Golem", GetSpriteFromID(ID::GOLEM, spriteBuffer)->texture, size)) {
+            editor->object_to_place_id = ID::GOLEM;
         }
         ImGui::SameLine();
         if (ImGui::ImageButton("Medusa", GetSpriteFromID(ID::MEDUSA, spriteBuffer)->texture, size)) {

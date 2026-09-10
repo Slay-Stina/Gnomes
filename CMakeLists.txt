@@ -10,7 +10,6 @@ set(DIR_ASSETS_DESTINATION $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets)
 
 find_package(SDL3 REQUIRED)
 find_package(SDL3_image REQUIRED)
-find_package(imgui CONFIG REQUIRED)
 
 # Flag executable specific files
 set(EXE_EXCLUSIVE ${CMAKE_SOURCE_DIR}/src/main.cpp
@@ -44,7 +43,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 ${SHARED_LIB_NAME})
 # DELAT BIBLIOTEK (.so)
 add_library(${LIB_NAME} SHARED ${LIB_EXCLUSIVE})
 target_include_directories(${LIB_NAME} PRIVATE include)
-target_link_libraries(${LIB_NAME} PRIVATE SDL3::SDL3 ${SHARED_LIB_NAME} jsoncpp imgui::imgui)
+target_link_libraries(${LIB_NAME} PRIVATE SDL3::SDL3 ${SHARED_LIB_NAME} jsoncpp imgui)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${DIR_ASSETS_ORIGIN} ${DIR_ASSETS_DESTINATION}

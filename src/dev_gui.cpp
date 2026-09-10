@@ -17,14 +17,14 @@ void Draw_Imgui_Arena_Usage(Arena* arena, std::string name_of_arena) {
     ImGui::ProgressBar(fraction, ImVec2(-1, 0), barText.c_str());
 }
 
-void Draw_History(CommandBuffer* buffer) {
+void Draw_History(CommandBuffer* buffer, LevelData* level) {
     int sliderPos = buffer->index;
     if (ImGui::SliderInt("history", &sliderPos, 0, buffer->head)) {
         while (buffer->index > sliderPos) {
             Undo(buffer);
         }
         while (buffer->index < sliderPos) {
-            Redo(buffer);
+            Redo(buffer, level);
         }
     }
 }
@@ -51,8 +51,8 @@ void DEV::PreDraw(ImGuiContext* saved_context) {
     if (ImGui::GetCurrentContext() == nullptr) {
         ImGui::SetCurrentContext(saved_context);
     }
-    //ImGui_ImplSDL3_NewFrame();
-    //ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui_ImplSDLRenderer3_NewFrame();
     ImGui::NewFrame();
 }
 
@@ -63,7 +63,7 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer) {
     Draw_Imgui_Arena_Usage(data->arena_levels, "levels");
     Draw_Imgui_Arena_Usage(data->arena_commands, "commands");
     Draw_Imgui_Arena_Usage(data->arena_entities, "entities");
-    Draw_History(data->commandBuffer);
+    Draw_History(data->commandBuffer, data->GetCurrentLevel());
     DrawFPS(*data->dt);
     ImGui::End();
     if (data->edit_level) {

@@ -16,7 +16,6 @@ struct GameData {
     int input_buffer_write_count;
     int input_buffer_read_count;
     const float* dt;
-    uint32_t command_timestamp;
 
     Editor editorData;
     Sprite* spriteBuffer;

@@ -16,10 +16,10 @@ enum class SPRITE_ID {
     Ground,
     Wall,
     Rock,
-    Gnome,
+    Demon,
     Medusa,
     Golem,
-    Ghost
+    Siren
 };
 
 struct SpriteDataEntry {
