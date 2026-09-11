@@ -1,5 +1,6 @@
 #include "levelRenderer.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include "rendering.h"
@@ -22,26 +23,36 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer) {
     }
 }
 
+bool IsEntityBelowOtherEntity(Entity* a, Entity* b) {
+    return a->y < b->y;
+}
+
 void RenderEntities(GameData* data, SDL_Renderer* renderer) {
     LevelData* lvl = data->GetCurrentLevel();
+    Entity** sortedEntities = ALLOC_ARRAY(data->arena_scratch, Entity*, lvl->entityCount);
+
     for (int i = 0; i < lvl->entityCount; i++) {
-        Entity entity = lvl->entityBuffer[i];
-        if (entity.id == ID::NONE) {
+        sortedEntities[i] = &lvl->entityBuffer[i];
+    }
+    sort(sortedEntities, sortedEntities + lvl->entityCount, IsEntityBelowOtherEntity);
+    for (int i = 0; i < lvl->entityCount; i++) {
+        Entity* entity = sortedEntities[i];
+        if (entity->id == ID::NONE) {
             continue;
         }
-        Sprite* sprite = GetSprite_FromEntityState(&entity, data->spriteBuffer);
-        if (HasBehaviour(&entity, IS_PETRIFIED)) {
+        Sprite* sprite = GetSprite_FromEntityState(entity, data->spriteBuffer);
+        if (HasBehaviour(entity, IS_PETRIFIED)) {
             sprite = GetSpriteFromID(ID::ROCK, data->spriteBuffer);
         }
-        float x_animated = std::lerp(entity.x_prev, entity.x, entity.progress_01);
-        float y_animated = std::lerp(entity.y_prev, entity.y, entity.progress_01);
+        float x_animated = std::lerp(entity->x_prev, entity->x, entity->progress_01);
+        float y_animated = std::lerp(entity->y_prev, entity->y, entity->progress_01);
         float dropshadow_y = y_animated;
-        if (HasBehaviour(&entity, JUMPS) && !HasBehaviour(&entity, IS_PUSHING)) {
-            y_animated -= 0.5 * sinf(entity.progress_01 * M_PI);
+        if (HasBehaviour(entity, JUMPS) && !HasBehaviour(entity, IS_PUSHING)) {
+            y_animated -= 0.5 * sinf(entity->progress_01 * M_PI);
         }
         Sprite* dropshadow = &data->spriteBuffer[(int) SPRITE_ID::Dropshadow];
         RenderEntity_OnTile(dropshadow, lvl, renderer, &data->camera, x_animated, dropshadow_y, 1, 0.4, false);
         RenderEntity_OnTile(sprite, lvl, renderer, &data->camera, x_animated, y_animated, 1, 1,
-                            entity.facing == Direction::RIGHT);
+                            entity->facing == Direction::RIGHT);
     }
 }

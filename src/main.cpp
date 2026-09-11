@@ -147,31 +147,30 @@ int main() {
     // Main memory
     Arena* arena_main = new Arena();
     Initialize(arena_main, game_memory, GAME_MEMORY_ALLOWANCE);
-    GameData* gameData = (GameData*) Allocate(arena_main, sizeof(GameData));
+    GameData* gameData = ALLOC(arena_main, GameData);
+    gameData->arena_scratch = CreateSubArena(arena_main, KILOBYTES(256));
 
     //Sprites memory
     int SPRITE_COUNT = 256;
     size_t IMAGE_ARENA_SIZE = sizeof(Sprite) * SPRITE_COUNT;
-    gameData->arena_images = Memory::CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
-    gameData->spriteBuffer = (Sprite*) Memory::Allocate(gameData->arena_images, sizeof(Sprite) * SPRITE_COUNT);
+    gameData->arena_images = CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
+    gameData->spriteBuffer = ALLOC_ARRAY(gameData->arena_images, Sprite, SPRITE_COUNT);
 
     //Levels memory
     gameData->arena_levels = CreateSubArena(arena_main, MEGABYTES(3));
     gameData->arena_entities = CreateSubArena(gameData->arena_levels, MEGABYTES(1));
-    gameData->levelCount = 5;
-    gameData->levels = (LevelData*) Allocate(gameData->arena_levels, sizeof(LevelData) * gameData->levelCount);
+    gameData->levels = ALLOC_ARRAY(gameData->arena_levels, LevelData, 5);
 
     //Commands memory
     gameData->arena_commands = CreateSubArena(gameData->arena_levels, MEGABYTES(1));
-    gameData->commandBuffer = (CommandBuffer*) Allocate(arena_main, sizeof(CommandBuffer));
+    gameData->commandBuffer = ALLOC(gameData->arena_commands, CommandBuffer);
     gameData->commandBuffer->capacity = 2000;
-    size_t COMMAND_SIZE = sizeof(AnyCommand) * gameData->commandBuffer->capacity;
-    gameData->commandBuffer->allCommands = (AnyCommand*) Allocate(gameData->arena_commands, COMMAND_SIZE);
+    gameData->commandBuffer->allCommands = ALLOC_ARRAY(gameData->arena_commands, AnyCommand,
+                                                       gameData->commandBuffer->capacity);
 
     //Input buffer memory
     gameData->input_buffer_capacity = 50;
-    size_t RING_BUFFER_SIZE = sizeof(Position) * gameData->input_buffer_capacity;
-    gameData->input_buffer = (Position*) Allocate(gameData->arena_levels, RING_BUFFER_SIZE);
+    gameData->input_buffer = ALLOC_ARRAY(gameData->arena_levels, Position, gameData->input_buffer_capacity);
 
     //Input management memory
     size_t INPUT_ARENA_SIZE = 0;
@@ -179,10 +178,10 @@ int main() {
     INPUT_ARENA_SIZE += sizeof(float) * SDL_SCANCODE_COUNT;
     INPUT_ARENA_SIZE += 128;
     gameData->arena_input = CreateSubArena(arena_main, INPUT_ARENA_SIZE);
-    gameData->input.keys_current = (bool*) Allocate(gameData->arena_input, sizeof(bool) * SDL_SCANCODE_COUNT);
-    gameData->input.keys_previous = (bool*) Allocate(gameData->arena_input, sizeof(bool) * SDL_SCANCODE_COUNT);
-    gameData->input.keys_held_time = (float*) Allocate(gameData->arena_input, sizeof(float) * SDL_SCANCODE_COUNT);
-    gameData->input.mouse_held_time = (float*) Allocate(gameData->arena_input, sizeof(float) * MOUSE_BUTTON_COUNT);
+    gameData->input.keys_current = ALLOC_ARRAY(gameData->arena_input, bool, SDL_SCANCODE_COUNT);
+    gameData->input.keys_previous = ALLOC_ARRAY(gameData->arena_input, bool, SDL_SCANCODE_COUNT);
+    gameData->input.keys_held_time = ALLOC_ARRAY(gameData->arena_input, float, SDL_SCANCODE_COUNT);
+    gameData->input.mouse_held_time = ALLOC_ARRAY(gameData->arena_input, float, SDL_SCANCODE_COUNT);
 
     DLL_INFO dll;
 
@@ -201,6 +200,7 @@ int main() {
 
     while (running) {
         DLL_CheckStatus(&dll);
+        Reset(gameData->arena_scratch);
         CalculateDeltaTime(dt);
 
         SDL_Event event;
