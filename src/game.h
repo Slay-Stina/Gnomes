@@ -7,8 +7,7 @@ void StoreGameState(Arena* arena);
 
 void RetrieveGameState(Arena* arena);
 
-bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDir, int yDir, int timestamp,
-             int strength);
+bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDir, int yDir, int strength);
 
 extern "C" {
 void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer);

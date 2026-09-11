@@ -41,6 +41,7 @@ bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDi
     if (HasBehaviour(stepInto_entity, CAN_MOVE) && !HasBehaviour(stepInto_entity, UNPUSHABLE)) {
         if (TryMove(stepInto_entity, level, cmd_buffer, xDir, yDir, --strength)) {
             MoveCommand mv(mover, xDir, yDir);
+            AddBehaviour(mover, IS_PUSHING);
             Push(cmd_buffer, mv, level);
             return true;
         }
@@ -140,6 +141,10 @@ void Update(GameData* data, float dt) {
 
         for (int i = 0; i < data->GetCurrentLevel()->entityCount; i++) {
             Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
+            if (HasBehaviour(entity, IS_PUSHING)) {
+                RemoveBehaviour(entity, IS_PUSHING);
+            }
+            
             if (HasBehaviour(entity, (Behaviour) (RESPOND_TO_INPUT | CAN_MOVE))) {
                 if (HasBehaviour(entity, IS_PETRIFIED)) {
                     continue;

@@ -19,6 +19,7 @@ void InitializeBaseBehaviour(Entity* entity) {
             break;
         case ID::DEMON:
             SetBehaviour(entity, (Behaviour) (CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
+            AddBehaviour(entity, JUMPS);
             entity->strength = 1;
             break;
         case ID::GOLEM:
@@ -28,6 +29,7 @@ void InitializeBaseBehaviour(Entity* entity) {
             break;
         case ID::MEDUSA:
             SetBehaviour(entity, (Behaviour) (CAN_ROTATE | CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
+            AddBehaviour(entity, JUMPS);
             entity->strength = 1;
             break;
         case ID::SIREN:
