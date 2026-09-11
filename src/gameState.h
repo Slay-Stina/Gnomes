@@ -19,6 +19,7 @@ struct GameData {
 
     Editor editorData;
     Sprite* spriteBuffer;
+    Arena* arena_scratch;
     Arena* arena_entities;
     Arena* arena_commands;
     Arena* arena_levels;
