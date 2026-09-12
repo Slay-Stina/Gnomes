@@ -148,13 +148,13 @@ int main() {
     Arena* arena_main = new Arena();
     Initialize(arena_main, game_memory, GAME_MEMORY_ALLOWANCE);
     GameData* gameData = ALLOC(arena_main, GameData);
+    gameData->arena_main = arena_main;
     gameData->arena_scratch = CreateSubArena(arena_main, KILOBYTES(256));
 
     //Sprites memory
     int SPRITE_COUNT = 256;
-    size_t IMAGE_ARENA_SIZE = sizeof(Sprite) * SPRITE_COUNT;
+    size_t IMAGE_ARENA_SIZE = (sizeof(Sprite*) * SPRITE_COUNT) + (sizeof(Sprite) * SPRITE_COUNT);
     gameData->arena_images = CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
-    gameData->spriteBuffer = ALLOC_ARRAY(gameData->arena_images, Sprite, SPRITE_COUNT);
 
     //Levels memory
     gameData->arena_levels = CreateSubArena(arena_main, MEGABYTES(3));

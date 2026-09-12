@@ -1,107 +1,39 @@
 #include "spriteLibrary.h"
-
-#include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <cassert>
 
-using namespace std;
+namespace {
+    const char* FALLBACK_PATH = "assets/sprites/fallback.png";
 
-const char* FALLBACK_PATH = "assets/sprites/fallback.png";
+    struct SpriteDataEntry {
+        SPRITE_ID id;
+        const char* path;
+        int pivot_x = NOT_SET;
+        int pivot_y = NOT_SET;
+    };
 
-static const SpriteDataEntry all_sprite_data[] = {
-        {SPRITE_ID::Fallback, FALLBACK_PATH, 0, 0},
-        {SPRITE_ID::Wall, "assets/sprites/wall.png", 0, 0},
-        {SPRITE_ID::Demon, "assets/sprites/player.png"},
-        {SPRITE_ID::Rock, "assets/sprites/rock.png"},
-        {SPRITE_ID::Ground, "assets/sprites/ground.png", 0, 0},
-        {SPRITE_ID::Golem, "assets/sprites/golem.png"},
-        {SPRITE_ID::Ground_alt, "assets/sprites/ground_alt.png", 0, 0},
-        {SPRITE_ID::Medusa_Idle_Side, "assets/sprites/medusa_idle_side.png", 12, 24},
-        {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24},
-        {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24},
-        {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 3}
-};
+    const SpriteDataEntry ALL_SPRITE_DATA[] = {
+            {SPRITE_ID::Fallback, FALLBACK_PATH, 0, 0},
+            {SPRITE_ID::Wall, "assets/sprites/wall.png", 0, 0},
+            {SPRITE_ID::Demon, "assets/sprites/player.png"},
+            {SPRITE_ID::Rock, "assets/sprites/rock.png"},
+            {SPRITE_ID::Ground, "assets/sprites/ground.png", 0, 0},
+            {SPRITE_ID::Golem, "assets/sprites/golem.png"},
+            {SPRITE_ID::Ground_alt, "assets/sprites/ground_alt.png", 0, 0},
+            {SPRITE_ID::Medusa_Idle_Side, "assets/sprites/medusa_idle_side.png", 12, 24},
+            {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24},
+            {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24},
+            {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 3}
+    };
 
-Sprite* GetSpriteFromID(ID id, Sprite* spriteBuffer) {
-    Sprite* sprite_to_return = nullptr;
-    switch (id) {
-        case ID::NONE:
-            sprite_to_return = nullptr;
-            break;
-        case ID::GROUND:
-            sprite_to_return = &spriteBuffer[(int) SPRITE_ID::Ground];
-            break;
-        case ID::WALL:
-            sprite_to_return = &spriteBuffer[(int) SPRITE_ID::Wall];
-            break;
-        case ID::DEMON:
-            sprite_to_return = &spriteBuffer[(int) SPRITE_ID::Demon];
-            break;
-        case ID::ROCK:
-            sprite_to_return = &spriteBuffer[(int) SPRITE_ID::Rock];
-            break;
-        case ID::MEDUSA:
-            sprite_to_return = &spriteBuffer[(int) SPRITE_ID::Medusa_Idle_Front];
-            break;
-        case ID::SIREN:
-            sprite_to_return = &spriteBuffer[(int) SPRITE_ID::Siren];
-            break;
-        case ID::GOLEM:
-            sprite_to_return = &spriteBuffer[(int) SPRITE_ID::Golem];
-            break;
-        default:
-            sprite_to_return = &spriteBuffer[(int) SPRITE_ID::Fallback];
-            break;
-    }
-    if (sprite_to_return == nullptr || sprite_to_return->texture == nullptr) {
-        sprite_to_return = &spriteBuffer[(int) SPRITE_ID::Fallback];
-    }
-    return sprite_to_return;
-}
-
-Sprite* GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer) {
-    if (HasBehaviour(entity, IS_PETRIFIED)) {
-        return &spritebuffer[(int) SPRITE_ID::Rock];
-    }
-    switch (entity->id) {
-        case ID::MEDUSA:
-            switch (entity->facing) {
-                case Direction::RIGHT:
-                case Direction::LEFT:
-                    return &spritebuffer[(int) SPRITE_ID::Medusa_Idle_Side];
-                    break;
-                case Direction::DOWN:
-                    return &spritebuffer[(int) SPRITE_ID::Medusa_Idle_Back];
-                    break;
-                case Direction::UP:
-                    return &spritebuffer[(int) SPRITE_ID::Medusa_Idle_Front];
-                    break;
-            }
-        default:
-            return GetSpriteFromID(entity->id, spritebuffer);
-            break;
-    }
-    return nullptr;
-}
-
-namespace AssetManagement {
-    void LoadAllSprites(Sprite* spriteBuffer, SDL_Renderer* renderer) {
-        for (SpriteDataEntry entry: all_sprite_data) {
-            LoadSprite(spriteBuffer, entry, renderer);
-        }
-    }
-
-    void LoadSprite(Sprite* spriteBuffer, SpriteDataEntry entry, SDL_Renderer* renderer) {
+    void LoadOne(Sprite* sprite, const SpriteDataEntry& entry, SDL_Renderer* renderer) {
         SDL_Surface* surface = IMG_Load(entry.path);
-        if (surface == nullptr) {
+        if (surface == nullptr)
             surface = IMG_Load(FALLBACK_PATH);
-        }
         assert(surface != nullptr);
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-        Sprite* sprite = &spriteBuffer[(int) entry.id];
-        sprite->texture = texture;
-        sprite->height = texture->h;
-        sprite->width = texture->w;
+        sprite->texture = SDL_CreateTextureFromSurface(renderer, surface);
+        sprite->width = sprite->texture->w;
+        sprite->height = sprite->texture->h;
         if (entry.pivot_x == NOT_SET || entry.pivot_y == NOT_SET) {
             sprite->pivot_x = sprite->width / 2;
             sprite->pivot_y = sprite->height / 2;
@@ -111,4 +43,66 @@ namespace AssetManagement {
         }
         SDL_DestroySurface(surface);
     }
+}
+
+void SpriteLibrary::LoadAll(SDL_Renderer* renderer, Memory::Arena* arena) {
+    for (const SpriteDataEntry& entry: ALL_SPRITE_DATA) {
+        Sprite* sprite = ALLOC(arena, Sprite);
+        LoadOne(sprite, entry, renderer);
+        sprites[(int) entry.id] = sprite;
+    }
+}
+
+Sprite* SpriteLibrary::Get(ID id) const {
+    Sprite* result = nullptr;
+    switch (id) {
+        case ID::GROUND:
+            result = sprites[(int) SPRITE_ID::Ground];
+            break;
+        case ID::WALL:
+            result = sprites[(int) SPRITE_ID::Wall];
+            break;
+        case ID::ROCK:
+            result = sprites[(int) SPRITE_ID::Rock];
+            break;
+        case ID::DEMON:
+            result = sprites[(int) SPRITE_ID::Demon];
+            break;
+        case ID::GOLEM:
+            result = sprites[(int) SPRITE_ID::Golem];
+            break;
+        case ID::MEDUSA:
+            result = sprites[(int) SPRITE_ID::Medusa_Idle_Front];
+            break;
+        default:
+            result = sprites[(int) SPRITE_ID::Fallback];
+            break;
+    }
+    if (result == nullptr || result->texture == nullptr) {
+        result = sprites[(int) SPRITE_ID::Fallback];
+    }
+    return result;
+}
+
+Sprite* SpriteLibrary::GetFromEntity(const Entity* entity) const {
+    if (HasBehaviour(entity, IS_PETRIFIED)) {
+        return sprites[(int) SPRITE_ID::Rock];
+    }
+    if (entity->id == ID::MEDUSA) {
+        switch (entity->facing) {
+            case Direction::RIGHT:
+            case Direction::LEFT:
+                return sprites[(int) SPRITE_ID::Medusa_Idle_Side];
+            case Direction::DOWN:
+                return sprites[(int) SPRITE_ID::Medusa_Idle_Back];
+            case Direction::UP:
+                return sprites[(int) SPRITE_ID::Medusa_Idle_Front];
+        }
+    }
+    return Get(entity->id);
+}
+
+Sprite* SpriteLibrary::GetBySpriteID(SPRITE_ID id) const {
+    Sprite* s = sprites[(int) id];
+    return (s && s->texture) ? s : sprites[(int) SPRITE_ID::Fallback];
 }

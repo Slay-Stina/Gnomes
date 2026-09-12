@@ -18,7 +18,8 @@ struct GameData {
     const float* dt;
 
     Editor editorData;
-    Sprite* spriteBuffer;
+    SpriteLibrary sprites;
+    Arena* arena_main;
     Arena* arena_scratch;
     Arena* arena_entities;
     Arena* arena_commands;

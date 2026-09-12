@@ -7,30 +7,30 @@
 #include "rendering.h"
 
 namespace EDITOR {
-    void DrawObjectPanel(Editor* editor, Sprite* spriteBuffer) {
+    void DrawObjectPanel(Editor* editor, SpriteLibrary& sprites) {
         ImGui::Begin("objects");
         ImVec2 size = {32, 32};
-        if (ImGui::ImageButton("Ground", GetSpriteFromID(ID::GROUND, spriteBuffer)->texture, size)) {
+        if (ImGui::ImageButton("Ground", sprites.Get(ID::GROUND)->texture, size)) {
             editor->object_to_place_id = ID::GROUND;
         }
         ImGui::SameLine();
-        if (ImGui::ImageButton("Wall", GetSpriteFromID(ID::WALL, spriteBuffer)->texture, size)) {
+        if (ImGui::ImageButton("Wall", sprites.Get(ID::WALL)->texture, size)) {
             editor->object_to_place_id = ID::WALL;
         }
         ImGui::SameLine();
-        if (ImGui::ImageButton("Rock", GetSpriteFromID(ID::ROCK, spriteBuffer)->texture, size)) {
+        if (ImGui::ImageButton("Rock", sprites.Get(ID::ROCK)->texture, size)) {
             editor->object_to_place_id = ID::ROCK;
         }
         ImGui::SameLine();
-        if (ImGui::ImageButton("Demon", GetSpriteFromID(ID::DEMON, spriteBuffer)->texture, size)) {
+        if (ImGui::ImageButton("Demon", sprites.Get(ID::DEMON)->texture, size)) {
             editor->object_to_place_id = ID::DEMON;
         }
         ImGui::SameLine();
-        if (ImGui::ImageButton("Golem", GetSpriteFromID(ID::GOLEM, spriteBuffer)->texture, size)) {
+        if (ImGui::ImageButton("Golem", sprites.Get(ID::GOLEM)->texture, size)) {
             editor->object_to_place_id = ID::GOLEM;
         }
         ImGui::SameLine();
-        if (ImGui::ImageButton("Medusa", GetSpriteFromID(ID::MEDUSA, spriteBuffer)->texture, size)) {
+        if (ImGui::ImageButton("Medusa", sprites.Get(ID::MEDUSA)->texture, size)) {
             editor->object_to_place_id = ID::MEDUSA;
         }
         ImGui::End();
@@ -51,11 +51,11 @@ namespace EDITOR {
     }
 
     void DrawPreview(Editor* editor, Input* input, SDL_Renderer* renderer, LevelData* level, Camera* camera,
-                     Sprite* spriteBuffer) {
+                     SpriteLibrary& sprites) {
         int x;
         int y;
         camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level);
-        Sprite* preview = GetSpriteFromID(editor->object_to_place_id, spriteBuffer);
+        Sprite* preview = sprites.Get(editor->object_to_place_id);
         if (preview == nullptr) {
             return;
         }

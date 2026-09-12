@@ -67,7 +67,7 @@ struct Entity {
     Direction facing;
 };
 
-bool HasBehaviour(Entity* entity, Behaviour flags);
+bool HasBehaviour(const Entity* entity, Behaviour flags);
 
 void InitializeBaseBehaviour(Entity* entity);
 
