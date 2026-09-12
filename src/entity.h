@@ -18,15 +18,12 @@ enum Behaviour : uint32_t {
     IS_PUSHING = 1 << 7
 };
 
-enum class ID {
-    NONE = 0,
-    GROUND = 1,
-    WALL = 2,
-    DEMON = 3,
-    ROCK = 4,
-    GOLEM = 5,
-    MEDUSA = 6,
-    SIREN = 7
+enum class ENTITY_ID : uint8_t {
+    MEDUSA = 0,
+    DEMON = 1,
+    ROCK = 2,
+    SIREN = 3,
+    GOLEM = 4,
 };
 
 enum class Direction {
@@ -56,7 +53,8 @@ struct Position {
 };
 
 struct Entity {
-    ID id;
+    ENTITY_ID id;
+    bool active;
     int x;
     int y;
     int x_prev;

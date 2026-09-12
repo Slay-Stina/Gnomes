@@ -13,31 +13,31 @@ bool HasBehaviour(const Entity* entity, Behaviour flags) {
 }
 
 void InitializeBaseBehaviour(Entity* entity) {
-    assert(entity->id != ID::NONE);
+    assert(entity->active);
     switch (entity->id) {
         default:
             SetBehaviour(entity, NONE);
             break;
-        case ID::DEMON:
+        case ENTITY_ID::DEMON:
             SetBehaviour(entity, (Behaviour) (CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
             AddBehaviour(entity, JUMPS);
             entity->strength = 1;
             break;
-        case ID::GOLEM:
+        case ENTITY_ID::GOLEM:
             SetBehaviour(entity, (Behaviour) (CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
             AddBehaviour(entity, UNPUSHABLE);
             entity->strength = 999;
             break;
-        case ID::MEDUSA:
+        case ENTITY_ID::MEDUSA:
             SetBehaviour(entity, (Behaviour) (CAN_ROTATE | CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
             AddBehaviour(entity, JUMPS);
             entity->strength = 1;
             break;
-        case ID::SIREN:
+        case ENTITY_ID::SIREN:
             SetBehaviour(entity, (Behaviour) (CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
             entity->strength = 0;
             break;
-        case ID::ROCK:
+        case ENTITY_ID::ROCK:
             SetBehaviour(entity, CAN_MOVE);
             break;
     }
@@ -56,7 +56,7 @@ void RemoveBehaviour(Entity* entity, Behaviour flags) {
 }
 
 void PostMove(Entity* entity, LevelData* level, CommandBuffer* buffer) {
-    if (entity->id == ID::MEDUSA) {
+    if (entity->id == ENTITY_ID::MEDUSA) {
         Entity* entity_looked_at = RaycastFirstEntity(entity->x, entity->y, entity->facing, level);
         if (entity_looked_at != nullptr) {
             if (!HasBehaviour(entity_looked_at, IS_PETRIFIED)) {
@@ -71,7 +71,7 @@ void PostRotation(Entity* entity, LevelData* level, CommandBuffer* commandBuffer
     if (from == to) {
         return;
     }
-    if (entity->id == ID::MEDUSA) {
+    if (entity->id == ENTITY_ID::MEDUSA) {
         Entity* entity_looked_at = RaycastFirstEntity(entity->x, entity->y, to, level);
         if (entity_looked_at != nullptr) {
             if (!HasBehaviour(entity_looked_at, IS_PETRIFIED)) {
@@ -86,7 +86,7 @@ void PreRotation(Entity* entity, LevelData* level, CommandBuffer* commandBuffer,
     if (from == to) {
         return;
     }
-    if (entity->id == ID::MEDUSA) {
+    if (entity->id == ENTITY_ID::MEDUSA) {
         Entity* entity_previously_looked_at = RaycastFirstEntity(entity->x, entity->y, from, level);
         if (entity_previously_looked_at != nullptr) {
             if (HasBehaviour(entity_previously_looked_at, IS_PETRIFIED)) {

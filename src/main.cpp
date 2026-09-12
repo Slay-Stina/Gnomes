@@ -154,9 +154,9 @@ int main() {
     Gameplay* gameplay = &gameData->scenes.gameplay;
 
     //Sprites memory
-    int SPRITE_COUNT = 256;
-    size_t IMAGE_ARENA_SIZE = (sizeof(Sprite*) * SPRITE_COUNT) + (sizeof(Sprite) * SPRITE_COUNT);
+    size_t IMAGE_ARENA_SIZE = MEGABYTES(1);
     gameData->arena_images = CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
+    gameData->tilesetBuffer = ALLOC_ARRAY(gameData->arena_images, Tileset, (int) TILESETS::COUNT);
 
     //Levels memory
     gameData->arena_levels = CreateSubArena(arena_main, MEGABYTES(3));

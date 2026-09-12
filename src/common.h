@@ -17,8 +17,10 @@ const double FRAME_TIME_MS = 1000.0 / TARGET_FPS;
 
 const int SCREEN_WIDTH = 650;
 const int SCREEN_HEIGHT = 400;
+
 const int UPSCALE_FACTOR = 4;
-const int CELL_SIZE_PX = 16 * UPSCALE_FACTOR;
+const int TILE_SIZE_PX_RAW = 16;
+const int TILE_SIZE_PX_SCALED = TILE_SIZE_PX_RAW * UPSCALE_FACTOR;
 
 const float MOVE_SPEED = 6.0;
 const float UNDO_REPEAT_TIME = 0.15;

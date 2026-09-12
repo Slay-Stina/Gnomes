@@ -12,43 +12,73 @@ using namespace std;
 const int LEVEL_INDEX = 0;
 const int ENTITIES_INDEX = 1;
 
-uint8_t GetCellID(LevelData* level, int x, int y) {
+uint16_t GetCellID(LevelData* level, int x, int y) {
     assert(! (x < 0 || x >= level->w || y < 0 || y >= level->h));
     return level->cells[y * level->w + x];
 }
 
+bool IsWalkable(int x, int y, LevelData* level) {
+    uint16_t id = GetCellID(level, x, y);
+    return level->tileset->walkableBuffer[id];
+}
+
 Entity* GetEntity(LevelData* level, int x, int y) {
     for (int i = 0; i < level->entityCount; i++) {
-        if (level->entityBuffer[i].x == x && level->entityBuffer[i].y == y) {
+        if (level->entityBuffer[i].active && level->entityBuffer[i].x == x && level->entityBuffer[i].y == y) {
             return &level->entityBuffer[i];
         }
     }
     return nullptr;
 }
 
-void CreateLevel(Arena* arena, LevelData* level, const char* level_name) {
+void CreateLevel(Arena* arena, LevelData* level, const Tileset* tileset, const char* level_name) {
     ifstream stream(level_name);
     Json::CharReaderBuilder reader;
-    Json::Value jsonResult;
-    if (!Json::parseFromStream(reader, stream, &jsonResult, nullptr)) {
+    Json::Value result;
+    if (!Json::parseFromStream(reader, stream, &result, nullptr)) {
         return;
     }
 
-    const Json::Value& dataField = jsonResult["layers"][LEVEL_INDEX]["data"];
-    level->w = jsonResult["width"].asInt();
-    level->h = jsonResult["height"].asInt();
-    level->level_path = level_name;
+    // Hitta lagret som heter "level"
+    const Json::Value* levelLayer = nullptr;
+    for (const Json::Value& layer: result["layers"]) {
+        if (layer["name"].asString() == "level") {
+            levelLayer = &layer;
+            break;
+        }
+    }
+    assert(levelLayer != nullptr);
+    const Json::Value& levelData = (*levelLayer)["data"];
 
-    size_t size_of_cells = sizeof(uint8_t) * level->w * level->h;
-    level->cells = (uint8_t*) Allocate(arena, size_of_cells);
+    // Hitta första icke-noll-id för att bestämma tileset-offset
+    int first_non_zero_id = 0;
+    for (const Json::Value& value: levelData) {
+        if (value.asInt() != 0) {
+            first_non_zero_id = value.asInt();
+            break;
+        }
+    }
+    int id_offset = Get_Tileset_ID_Offset_From_Tilemap(first_non_zero_id, result);
+
+    level->w = result["width"].asInt();
+    level->h = result["height"].asInt();
+    level->level_path = level_name;
+    level->tileset = tileset;
+    level->cells = ALLOC_ARRAY(arena, uint16_t, level->w * level->h);
+
     for (int i = 0; i < level->w * level->h; i++) {
-        level->cells[i] = dataField[i].asUInt();
+        int local_id = levelData[i].asInt() - id_offset;
+        if (local_id < 0) {
+            local_id = 0;
+        }
+        level->cells[i] = local_id;
     }
 }
 
 void CreateEntities(LevelData* lvl_data, Arena* arena) {
     Reset(arena);
     lvl_data->entityCount = 0;
+    lvl_data->entityBuffer = ALLOC_ARRAY(arena, Entity, MAX_NUM_ENTITIES);
 
     ifstream stream(lvl_data->level_path);
     Json::CharReaderBuilder reader;
@@ -57,28 +87,33 @@ void CreateEntities(LevelData* lvl_data, Arena* arena) {
         return;
     }
 
-    const Json::Value& entityData = result["layers"][ENTITIES_INDEX]["data"];
-    for (int i = 0; i < lvl_data->w * lvl_data->h; i++) {
-        unsigned char entity_id = entityData[i].asUInt();
-        if (entity_id != 0) {
-            lvl_data->entityCount++;
+    const Json::Value* entityLayer = nullptr;
+    for (const Json::Value& layer: result["layers"]) {
+        if (layer["name"].asString() == "entities") {
+            entityLayer = &layer;
+            break;
         }
     }
+    if (entityLayer == nullptr) {
+        return;
+    }
+    const Json::Value& entities = (*entityLayer)["data"];
 
-    lvl_data->entityBuffer = ALLOC_ARRAY(arena, Entity, MAX_NUM_ENTITIES);
     for (int i = 0; i < lvl_data->w * lvl_data->h; i++) {
-        unsigned char entity_id = entityData[i].asUInt();
-        if (entity_id != 0) {
-            int x = i % lvl_data->w;
-            int y = i / lvl_data->w;
-            AddEntity((ID) entity_id, x, y, lvl_data);
+        int raw = entities[i].asInt();
+        if (raw == 0) {
+            continue;
         }
+        uint16_t entity_id = GetLocalTileID(raw, result);
+        int x = i % lvl_data->w;
+        int y = i / lvl_data->w;
+        AddEntity((ENTITY_ID) entity_id, x, y, lvl_data);
     }
 }
 
 Entity* GetNextAvailableEntity(LevelData* level) {
     for (int i = 0; i < level->entityCount; i++) {
-        if (level->entityBuffer[i].id == ID::NONE) {
+        if (!level->entityBuffer[i].active) {
             return &level->entityBuffer[i];
         }
     }
@@ -88,7 +123,7 @@ Entity* GetNextAvailableEntity(LevelData* level) {
     return &level->entityBuffer[level->entityCount++];
 }
 
-void AddEntity(ID entity_id, int x, int y, LevelData* level) {
+void AddEntity(ENTITY_ID entity_id, int x, int y, LevelData* level) {
     Entity* entity = GetEntity(level, x, y);
     if (entity == nullptr) {
         entity = GetNextAvailableEntity(level);
@@ -101,6 +136,7 @@ void AddEntity(ID entity_id, int x, int y, LevelData* level) {
     entity->x_prev = x;
     entity->y_prev = y;
     entity->id = entity_id;
+    entity->active = true;
     InitializeBaseBehaviour(entity);
 }
 
@@ -109,9 +145,7 @@ void RemoveEntity(int x, int y, LevelData* level) {
     if (entity == nullptr) {
         return;
     }
-    *entity = {};
-    entity->x = -1;
-    entity->y = -1;
+    entity->active = false;
 }
 
 Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, LevelData* level, bool ignore_walls) {
@@ -133,8 +167,7 @@ Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, Leve
     int x_search = x_origin + facingVector.x;
     int y_search = y_origin + facingVector.y;
     while (x_search >= 0 && x_search < level->w && y_search >= 0 && y_search < level->h) {
-        ID cellID = (ID) GetCellID(level, x_search, y_search);
-        if (cellID == ID::WALL && !ignore_walls) {
+        if (!IsWalkable(x_search, y_search, level) && !ignore_walls) {
             break;
         }
         Entity* entity_search = GetEntity(level, x_search, y_search);

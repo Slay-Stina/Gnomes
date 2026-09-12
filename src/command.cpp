@@ -18,7 +18,9 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* buffer, bool from_
             if (from_redo) {
                 mv->entity->progress_01 = 1;
             }
-            PostMove(mv->entity, level, buffer);
+            if (!from_redo) {
+                PostMove(mv->entity, level, buffer);
+            }
             break;
         }
         case CMD_TYPE::ROTATE: {
@@ -26,9 +28,13 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* buffer, bool from_
             if (!HasBehaviour(rotate->entity, CAN_ROTATE)) {
                 break;
             }
-            PreRotation(rotate->entity, level, buffer, rotate->from, rotate->to);
+            if (!from_redo) {
+                PreRotation(rotate->entity, level, buffer, rotate->from, rotate->to);
+            }
             rotate->entity->facing = rotate->to;
-            PostRotation(rotate->entity, level, buffer, rotate->from, rotate->to);
+            if (!from_redo) {
+                PostRotation(rotate->entity, level, buffer, rotate->from, rotate->to);
+            }
             break;
         }
         case CMD_TYPE::MODIFY_BEHAVIOUR: {

@@ -10,44 +10,34 @@ namespace EDITOR {
     void DrawObjectPanel(Editor* editor, SpriteLibrary& sprites) {
         ImGui::Begin("objects");
         ImVec2 size = {32, 32};
-        if (ImGui::ImageButton("Ground", sprites.Get(ID::GROUND)->texture, size)) {
-            editor->object_to_place_id = ID::GROUND;
+        if (ImGui::ImageButton("Rock", sprites.Get(ENTITY_ID::ROCK)->texture, size)) {
+            editor->object_to_place_id = ENTITY_ID::ROCK;
+            editor->has_selection = true;
         }
         ImGui::SameLine();
-        if (ImGui::ImageButton("Wall", sprites.Get(ID::WALL)->texture, size)) {
-            editor->object_to_place_id = ID::WALL;
+        if (ImGui::ImageButton("Demon", sprites.Get(ENTITY_ID::DEMON)->texture, size)) {
+            editor->object_to_place_id = ENTITY_ID::DEMON;
+            editor->has_selection = true;
         }
         ImGui::SameLine();
-        if (ImGui::ImageButton("Rock", sprites.Get(ID::ROCK)->texture, size)) {
-            editor->object_to_place_id = ID::ROCK;
+        if (ImGui::ImageButton("Golem", sprites.Get(ENTITY_ID::GOLEM)->texture, size)) {
+            editor->object_to_place_id = ENTITY_ID::GOLEM;
+            editor->has_selection = true;
         }
         ImGui::SameLine();
-        if (ImGui::ImageButton("Demon", sprites.Get(ID::DEMON)->texture, size)) {
-            editor->object_to_place_id = ID::DEMON;
-        }
-        ImGui::SameLine();
-        if (ImGui::ImageButton("Golem", sprites.Get(ID::GOLEM)->texture, size)) {
-            editor->object_to_place_id = ID::GOLEM;
-        }
-        ImGui::SameLine();
-        if (ImGui::ImageButton("Medusa", sprites.Get(ID::MEDUSA)->texture, size)) {
-            editor->object_to_place_id = ID::MEDUSA;
+        if (ImGui::ImageButton("Medusa", sprites.Get(ENTITY_ID::MEDUSA)->texture, size)) {
+            editor->object_to_place_id = ENTITY_ID::MEDUSA;
+            editor->has_selection = true;
         }
         ImGui::End();
     }
 
     void PlaceObject(const int x, const int y, Editor* editor, LevelData* level, CommandBuffer* buffer) {
-        if (editor->object_to_place_id == ID::NONE) {
+        if (!editor->has_selection) {
             return;
         }
-        if (editor->object_to_place_id == ID::GROUND || editor->object_to_place_id == ID::WALL) {
-            uint8_t previous = level->cells[y * level->w + x];
-            EditCommand edit(x, y, editor->object_to_place_id, previous);
-            Push(buffer, edit, level);
-        } else {
-            AddCommand add(x, y, editor->object_to_place_id);
-            Push(buffer, add, level);
-        }
+        AddCommand add(x, y, editor->object_to_place_id);
+        Push(buffer, add, level);
     }
 
     void DrawPreview(Editor* editor, Input* input, SDL_Renderer* renderer, LevelData* level, Camera* camera,
@@ -56,15 +46,10 @@ namespace EDITOR {
         int y;
         camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level);
         Sprite* preview = sprites.Get(editor->object_to_place_id);
-        if (preview == nullptr) {
+        if (preview == nullptr || !editor->has_selection) {
             return;
         }
-        if (editor->object_to_place_id == ID::GROUND || editor->object_to_place_id == ID::WALL) {
-            RenderSprite_Grid(preview, level, renderer, camera, x, y, 1, 0.5);
-        } else {
-            RenderEntity_OnTile(preview, level, renderer, camera, x, y, 1, 0.5);
-        }
-
+        RenderEntity_OnTile(preview, level, renderer, camera, x, y, 1, 0.5);
     }
 
     void Update(Editor* editor, Input* input, LevelData* level, CommandBuffer* buffer) {
