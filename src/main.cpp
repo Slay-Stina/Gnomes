@@ -151,6 +151,8 @@ int main() {
     gameData->arena_main = arena_main;
     gameData->arena_scratch = CreateSubArena(arena_main, KILOBYTES(256));
 
+    Gameplay* gameplay = &gameData->scenes.gameplay;
+
     //Sprites memory
     int SPRITE_COUNT = 256;
     size_t IMAGE_ARENA_SIZE = (sizeof(Sprite*) * SPRITE_COUNT) + (sizeof(Sprite) * SPRITE_COUNT);
@@ -159,18 +161,18 @@ int main() {
     //Levels memory
     gameData->arena_levels = CreateSubArena(arena_main, MEGABYTES(3));
     gameData->arena_entities = CreateSubArena(gameData->arena_levels, MEGABYTES(1));
-    gameData->levels = ALLOC_ARRAY(gameData->arena_levels, LevelData, 5);
+    gameplay->levels = ALLOC_ARRAY(gameData->arena_levels, LevelData, 5);
 
     //Commands memory
     gameData->arena_commands = CreateSubArena(gameData->arena_levels, MEGABYTES(1));
-    gameData->commandBuffer = ALLOC(gameData->arena_commands, CommandBuffer);
-    gameData->commandBuffer->capacity = 2000;
-    gameData->commandBuffer->allCommands = ALLOC_ARRAY(gameData->arena_commands, AnyCommand,
-                                                       gameData->commandBuffer->capacity);
+    gameplay->commandBuffer = ALLOC(gameData->arena_commands, CommandBuffer);
+    gameplay->commandBuffer->capacity = 2000;
+    gameplay->commandBuffer->allCommands = ALLOC_ARRAY(gameData->arena_commands, AnyCommand,
+                                                       gameplay->commandBuffer->capacity);
 
     //Input buffer memory
-    gameData->input_buffer_capacity = 50;
-    gameData->input_buffer = ALLOC_ARRAY(gameData->arena_levels, Position, gameData->input_buffer_capacity);
+    gameplay->input_buffer_capacity = 50;
+    gameplay->input_buffer = ALLOC_ARRAY(gameData->arena_levels, Position, gameplay->input_buffer_capacity);
 
     //Input management memory
     size_t INPUT_ARENA_SIZE = 0;

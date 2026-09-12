@@ -16,7 +16,7 @@ struct Sprite {
 enum class SPRITE_ID {
     Fallback, Ground, Ground_alt, Wall, Rock, Demon,
     Medusa_Idle_Side, Medusa_Idle_Front, Medusa_Idle_Back,
-    Golem, Siren, Dropshadow, COUNT // COUNT = antal, sista värdet
+    Golem, Siren, Dropshadow, titlescreen_background, black_1x1, COUNT // COUNT = antal, sista värdet
 };
 
 class SpriteLibrary {

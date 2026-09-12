@@ -73,6 +73,7 @@ void DEV::PreDraw(ImGuiContext* saved_context) {
 }
 
 void DEV::Draw(GameData* data, SDL_Renderer* renderer) {
+    Gameplay* gameplay = &data->scenes.gameplay;
     ImGui::Begin("Dev Tools");
     ImGui::Text("memory arena usage");
     Draw_Imgui_Arena_Usage(data->arena_main, "total");
@@ -80,12 +81,12 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer) {
     Draw_Imgui_Arena_Usage(data->arena_levels, "levels");
     Draw_Imgui_Arena_Usage(data->arena_commands, "commands");
     Draw_Imgui_Arena_Usage(data->arena_entities, "entities");
-    Draw_History(data->commandBuffer, data->GetCurrentLevel());
+    Draw_History(gameplay->commandBuffer, GetCurrentLevel(gameplay));
     DrawFPS(*data->dt);
     ImGui::End();
-    if (data->edit_level) {
-        EDITOR::DrawObjectPanel(&data->editorData, data->sprites);
-        EDITOR::DrawPreview(&data->editorData, &data->input, renderer, data->GetCurrentLevel(), &data->camera,
+    if (data->editor_data.edit_level) {
+        EDITOR::DrawObjectPanel(&data->editor_data.editor, data->sprites);
+        EDITOR::DrawPreview(&data->editor_data.editor, &data->input, renderer, GetCurrentLevel(gameplay), &data->camera,
                             data->sprites);
     }
     ImGui::Render();

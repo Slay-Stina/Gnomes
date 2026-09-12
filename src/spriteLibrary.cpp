@@ -23,7 +23,9 @@ namespace {
             {SPRITE_ID::Medusa_Idle_Side, "assets/sprites/medusa_idle_side.png", 12, 24},
             {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24},
             {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24},
-            {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 3}
+            {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 3},
+            {SPRITE_ID::black_1x1, "assets/sprites/1x1_black.png", 0, 0},
+            {SPRITE_ID::titlescreen_background, "assets/sprites/titlescreen.png", 0, 0}
     };
 
     void LoadOne(Sprite* sprite, const SpriteDataEntry& entry, SDL_Renderer* renderer) {
