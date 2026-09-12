@@ -1,5 +1,6 @@
 #include <cassert>
 
+#include "command.h"
 #include "entity.h"
 #include "levels.h"
 

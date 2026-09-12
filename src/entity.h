@@ -2,8 +2,8 @@
 #include <cassert>
 #include <cstdint>
 
-#include "command.h"
 
+struct CommandBuffer;
 struct LevelData;
 
 enum Behaviour : uint32_t {
