@@ -5,19 +5,20 @@
 
 #include "rendering.h"
 
-void RenderLevel(GameData* gameData, SDL_Renderer* renderer) {
-    LevelData* lvl = gameData->GetCurrentLevel();
+void RenderLevel(GameData* data, SDL_Renderer* renderer) {
+    Gameplay* gameplay = &data->scenes.gameplay;
+    LevelData* lvl = GetCurrentLevel(gameplay);
     for (int x = 0; x < lvl->w; x++) {
         for (int y = 0; y < lvl->h; y++) {
             uint8_t cellType = GetCellID(lvl, x, y);
             Sprite* sprite;
             if (ID(cellType) == ID::GROUND) {
                 SPRITE_ID floorId = (x + y) % 2 == 0 ? SPRITE_ID::Ground : SPRITE_ID::Ground_alt;
-                sprite = gameData->sprites.GetBySpriteID(floorId);
+                sprite = data->sprites.GetBySpriteID(floorId);
             } else {
-                sprite = gameData->sprites.Get((ID) cellType);
+                sprite = data->sprites.Get((ID) cellType);
             }
-            RenderSprite_Grid(sprite, lvl, renderer, &gameData->camera, x, y);
+            RenderSprite_Grid(sprite, lvl, renderer, &data->camera, x, y);
         }
     }
 }
@@ -27,7 +28,8 @@ bool IsEntityBelowOtherEntity(Entity* a, Entity* b) {
 }
 
 void RenderEntities(GameData* data, SDL_Renderer* renderer) {
-    LevelData* lvl = data->GetCurrentLevel();
+    Gameplay* gameplay = &data->scenes.gameplay;
+    LevelData* lvl = GetCurrentLevel(gameplay);
     Entity** sortedEntities = ALLOC_ARRAY(data->arena_scratch, Entity*, lvl->entityCount);
 
     for (int i = 0; i < lvl->entityCount; i++) {
