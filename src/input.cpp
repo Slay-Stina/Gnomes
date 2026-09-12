@@ -1,5 +1,7 @@
 #include "input.h"
 
+#include <cassert>
+
 bool AnyKeyPressed(const Input* input) {
     for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
         if (KeyPressed(input, (SDL_Scancode) i)) {
@@ -52,7 +54,7 @@ void ResetKeyHeldTime(Input* input, SDL_Scancode key) {
 void ResetAll(Input* input) {
     memset((void*) input->keys_current, 0, sizeof(bool) * SDL_SCANCODE_COUNT);
     memset((void*) input->keys_previous, 0, sizeof(bool) * SDL_SCANCODE_COUNT);
-    memset((void*) input->keys_held_time, 0, sizeof(float) * SDL_SCANCODE_COUNT);
+    memset(input->keys_held_time, 0, sizeof(float) * SDL_SCANCODE_COUNT);
 }
 
 SDL_MouseButtonFlags ButtonToFlag(MouseButtons button) {
@@ -63,6 +65,9 @@ SDL_MouseButtonFlags ButtonToFlag(MouseButtons button) {
             return SDL_BUTTON_MMASK;
         case MouseButtons::RIGHT:
             return SDL_BUTTON_RMASK;
+            break;
+        case MouseButtons::COUNT:
+            assert(false);
             break;
     }
 }

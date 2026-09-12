@@ -23,7 +23,7 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer) {
     for (int x = 0; x < level->w; x++) {
         for (int y = 0; y < level->h; y++) {
             uint16_t id = GetCellID(level, x, y);
-            RenderTile_World(tileset, id, level, renderer, &gameData->camera, x, y, 1, 1);
+            RenderTile(tileset, id, level, renderer, &gameData->camera, x, y, 1, 1);
         }
     }
 }
@@ -41,24 +41,26 @@ void RenderEntities(GameData* data, SDL_Renderer* renderer) {
         sortedEntities[i] = &lvl->entityBuffer[i];
     }
     sort(sortedEntities, sortedEntities + lvl->entityCount, IsEntityBelowOtherEntity);
+
+    Entity* activeEntity = gameplay->activePlayerBuffer[gameplay->activePlayerIndex];
     for (int i = 0; i < lvl->entityCount; i++) {
         Entity* entity = sortedEntities[i];
         if (!entity->active) {
             continue;
         }
-        Sprite* sprite = data->sprites.GetFromEntity(entity);
-        if (HasBehaviour(entity, IS_PETRIFIED)) {
-            sprite = data->sprites.Get(ENTITY_ID::ROCK);
-        }
+        SpriteRenderInfo sprite = data->sprites.GetSprite_FromEntityState(entity);
         float x_animated = std::lerp(entity->x_prev, entity->x, entity->progress_01);
         float y_animated = std::lerp(entity->y_prev, entity->y, entity->progress_01);
-        float dropshadow_y = y_animated;
-        if (HasBehaviour(entity, JUMPS) && !HasBehaviour(entity, IS_PUSHING)) {
+        float ground_y = y_animated;
+        if (entity->action == Actions::MOVING && HasBehaviour(entity, JUMPS) && !HasBehaviour(entity, IS_PUSHING)) {
             y_animated -= 0.5 * sinf(entity->progress_01 * M_PI);
         }
         Sprite* dropshadow = data->sprites.GetBySpriteID(SPRITE_ID::Dropshadow);
-        RenderEntity_OnTile(dropshadow, lvl, renderer, &data->camera, x_animated, dropshadow_y, 1, 0.4, false);
-        RenderEntity_OnTile(sprite, lvl, renderer, &data->camera, x_animated, y_animated, 1, 1,
-                            entity->facing == Direction::RIGHT);
+        RenderSprite_OnTile(dropshadow, lvl, renderer, &data->camera, x_animated, ground_y, 1, 0.4, false);
+        if (entity == activeEntity) {
+            SpriteRenderInfo marker = data->sprites.GetBySpriteID(SPRITE_ID::selection_marker);
+            RenderSprite_OnTile(marker, lvl, renderer, &data->camera, x_animated, ground_y);
+        }
+        RenderSprite_OnTile(sprite, lvl, renderer, &data->camera, x_animated, y_animated, 1, 1, sprite.flipped);
     }
 }

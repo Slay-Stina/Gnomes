@@ -11,7 +11,7 @@ struct Editor {
 namespace EDITOR {
     void DrawObjectPanel(Editor* editor, SpriteLibrary& sprites);
 
-    void PlaceObject(const int x, const int y, Editor* editor, LevelData* level, CommandBuffer* commandbuffer);
+    void PlaceObject(int x, int y, Editor* editor, LevelData* level, CommandBuffer* commandbuffer);
 
     void Update(Editor* editor, Input* input, LevelData* level, CommandBuffer* buffer);
 

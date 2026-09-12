@@ -20,30 +20,27 @@ enum Behaviour : uint32_t {
 
 enum class ENTITY_ID : uint8_t {
     MEDUSA = 0,
-    DEMON = 1,
+    GNOME = 1,
     ROCK = 2,
     SIREN = 3,
     GOLEM = 4,
 };
 
 enum class Direction {
+    DOWN,
     RIGHT,
     LEFT,
-    UP,
-    DOWN
+    UP
 };
 
 inline Direction DirectionFromXY(int xDir, int yDir) {
     assert(xDir * yDir == 0);
-    if (xDir == 1) {
+    if (xDir == 1)
         return Direction::RIGHT;
-    }
-    if (xDir == -1) {
+    if (xDir == -1)
         return Direction::LEFT;
-    }
-    if (yDir == 1) {
+    if (yDir == -1)
         return Direction::UP;
-    }
     return Direction::DOWN;
 }
 
@@ -51,6 +48,13 @@ struct Position {
     int x;
     int y;
 };
+
+enum class Actions {
+    NONE = 0,
+    MOVING = 1,
+    ROTATING = 2
+};
+
 
 struct Entity {
     ENTITY_ID id;
@@ -61,9 +65,13 @@ struct Entity {
     int y_prev;
     int strength;
     float progress_01;
+    Actions action;
     Behaviour behaviour;
-    Direction facing;
+    Direction facing_current;
+    Direction facing_previous;
 };
+
+bool IsActing(Entity* e);
 
 bool HasBehaviour(const Entity* entity, Behaviour flags);
 
@@ -74,8 +82,6 @@ void SetBehaviour(Entity* entity, Behaviour flags);
 void AddBehaviour(Entity* entity, Behaviour flags);
 
 void RemoveBehaviour(Entity* entity, Behaviour flags);
-
-bool IsMoving(Entity* e);
 
 void PostMove(Entity* entity, LevelData* level, CommandBuffer* commandBuffer);
 

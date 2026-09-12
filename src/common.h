@@ -15,8 +15,8 @@ constexpr size_t GAME_MEMORY_ALLOWANCE = MEGABYTES(10);
 constexpr int TARGET_FPS = 60;
 const double FRAME_TIME_MS = 1000.0 / TARGET_FPS;
 
-const int SCREEN_WIDTH = 650;
-const int SCREEN_HEIGHT = 400;
+const int SCREEN_WIDTH = 960;
+const int SCREEN_HEIGHT = 540;
 
 const int UPSCALE_FACTOR = 4;
 const int TILE_SIZE_PX_RAW = 16;

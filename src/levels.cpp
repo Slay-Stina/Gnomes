@@ -137,6 +137,7 @@ void AddEntity(ENTITY_ID entity_id, int x, int y, LevelData* level) {
     entity->y_prev = y;
     entity->id = entity_id;
     entity->active = true;
+    entity->action = Actions::NONE;
     InitializeBaseBehaviour(entity);
 }
 
@@ -158,10 +159,10 @@ Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, Leve
             facingVector = {-1, 0};
             break;
         case Direction::UP:
-            facingVector = {0, 1};
+            facingVector = {0, -1};
             break;
         case Direction::DOWN:
-            facingVector = {0, -1};
+            facingVector = {0, 1};
             break;
     }
     int x_search = x_origin + facingVector.x;

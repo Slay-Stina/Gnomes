@@ -5,7 +5,9 @@
 #include "entity.h"
 #include "levels.h"
 
-void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* buffer, bool from_redo = false) {
+enum class FromRedo { No, Yes };
+
+void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* buffer, FromRedo from_redo = FromRedo::No) {
     switch (cmd.command.type) {
         case CMD_TYPE::NONE:
             break;
@@ -15,10 +17,11 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* buffer, bool from_
             mv->entity->y_prev = mv->entity->y;
             mv->entity->x += mv->xDir;
             mv->entity->y += mv->yDir;
-            if (from_redo) {
+            if (from_redo == FromRedo::Yes) {
                 mv->entity->progress_01 = 1;
             }
-            if (!from_redo) {
+            mv->entity->action = Actions::MOVING;
+            if (from_redo == FromRedo::No) {
                 PostMove(mv->entity, level, buffer);
             }
             break;
@@ -28,11 +31,16 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* buffer, bool from_
             if (!HasBehaviour(rotate->entity, CAN_ROTATE)) {
                 break;
             }
-            if (!from_redo) {
+            if (from_redo == FromRedo::Yes) {
+                rotate->entity->progress_01 = 1;
+            }
+            rotate->entity->action = Actions::ROTATING;
+            if (from_redo == FromRedo::No) {
                 PreRotation(rotate->entity, level, buffer, rotate->from, rotate->to);
             }
-            rotate->entity->facing = rotate->to;
-            if (!from_redo) {
+            rotate->entity->facing_previous = rotate->from;
+            rotate->entity->facing_current = rotate->to;
+            if (from_redo == FromRedo::No) {
                 PostRotation(rotate->entity, level, buffer, rotate->from, rotate->to);
             }
             break;
@@ -56,9 +64,9 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* buffer, bool from_
             RemoveEntity(remove->x, remove->y, level);
             break;
         }
-        case CMD_TYPE::EDIT: {
-            EditCommand* edit = &cmd.edit;
-            level->cells[edit->y * level->w + edit->x] = (int) edit->id;
+        case CMD_TYPE::SWAP_ACTIVE: {
+            SwapActiveEntityCommand* swap = &cmd.swap_active;
+            *swap->value_to_change = swap->index_current;
             break;
         }
     }
@@ -70,7 +78,7 @@ void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* level) {
     buffer->allCommands[buffer->index].command.timestamp = buffer->timestamp;
     buffer->index++;
     buffer->head = buffer->index;
-    Execute(cmd, level, buffer);
+    Execute(cmd, level, buffer, FromRedo::No);
 }
 
 void Undo(CommandBuffer* buffer, LevelData* level) {
@@ -95,7 +103,8 @@ void Undo(CommandBuffer* buffer, LevelData* level) {
             if (!HasBehaviour(rotate.entity, CAN_ROTATE)) {
                 break;
             }
-            rotate.entity->facing = rotate.from;
+            rotate.entity->facing_current = rotate.from;
+            rotate.entity->progress_01 = 1;
             break;
         }
         case CMD_TYPE::MODIFY_BEHAVIOUR: {
@@ -123,9 +132,9 @@ void Undo(CommandBuffer* buffer, LevelData* level) {
             SetBehaviour(entity, remove->storedBehaviour);
             break;
         }
-        case CMD_TYPE::EDIT: {
-            EditCommand* edit = &cmd.edit;
-            level->cells[edit->y * level->w + edit->x] = edit->previous;
+        case CMD_TYPE::SWAP_ACTIVE: {
+            SwapActiveEntityCommand* swap = &cmd.swap_active;
+            *swap->value_to_change = swap->index_previous;
             break;
         }
     }
@@ -141,7 +150,7 @@ void Redo(CommandBuffer* buffer, LevelData* level) {
         return;
     }
     AnyCommand cmd = buffer->allCommands[buffer->index];
-    Execute(cmd, level, buffer, true);
+    Execute(cmd, level, buffer, FromRedo::Yes);
     buffer->index++;
     int timestamp = cmd.command.timestamp;
     if (buffer->index != buffer->head) {

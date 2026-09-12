@@ -18,6 +18,8 @@ struct Gameplay {
     int input_buffer_write_count;
     int input_buffer_read_count;
     bool initialized;
+    int activePlayerIndex;
+    Entity** activePlayerBuffer;
 };
 
 struct MainMenu {
@@ -29,9 +31,14 @@ struct TitleScreen {
 struct Credits {
 };
 
+constexpr int FPS_BUFFER_COUNT = 100;
+
 struct EditorData {
     Editor editor;
     bool edit_level;
+    bool show_dev = true;
+    float fps_buffer[FPS_BUFFER_COUNT] = {};
+    int fps_buffer_index = 0;
 };
 
 struct Transition {
@@ -63,6 +70,7 @@ enum class SCENE_TYPES : uint8_t {
 
 struct GameData {
     const float* dt;
+    float* dt_scaler;
     SCENE_TYPES scene_current;
     SCENE_TYPES scene_previous;
     Scenes scenes;
@@ -84,4 +92,8 @@ struct GameData {
 
 inline LevelData* GetCurrentLevel(Gameplay* game) {
     return &game->levels[game->currentLevelIndex];
+}
+
+inline Entity* GetActiveEntity(Gameplay* game) {
+    return game->activePlayerBuffer[game->activePlayerIndex];
 }
