@@ -87,12 +87,40 @@ void ChangeScene(GameData* data, SCENE_TYPES new_scene) {
 void InitializeGame(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer) {
     assert(gameplay->initialized == false);
     gameplay->currentLevelIndex = 0;
+    gameplay->activePlayerIndex = 0;
     CreateLevel(arena_levels, &gameplay->levels[0], &tilesetBuffer[(int) TILESETS::Dungeon],
                 "assets/levels/testing.tmj");
     gameplay->initialized = true;
 }
 
-void UpdateGame(Gameplay* gameplay, Input* input, const float dt) {
+void UpdateGame(Gameplay* gameplay, Input* input, Arena* arena_scratch, const float dt) {
+    LevelData* level = GetCurrentLevel(gameplay);
+    Entity* entityBuffer = level->entityBuffer;
+
+    // Check player count and put them in buffer
+    int player_count = 0;
+    for (int i = 0; i < level->entityCount; i++) {
+        if (entityBuffer[i].active == false) {
+            continue;
+        }
+        if (HasBehaviour(&level->entityBuffer[i], IS_PLAYER)) {
+            player_count++;
+        }
+    }
+    int index = 0;
+    gameplay->activePlayerBuffer = ALLOC_ARRAY(arena_scratch, Entity*, player_count);
+    if (player_count == 0) {
+        return;
+    }
+    for (int i = 0; i < level->entityCount; i++) {
+        if (entityBuffer[i].active == false) {
+            continue;
+        }
+        if (HasBehaviour(&level->entityBuffer[i], IS_PLAYER)) {
+            gameplay->activePlayerBuffer[index++] = &level->entityBuffer[i];
+        }
+    }
+    
     //Check input to undo/redo
     if (KeyPressed(input, SDL_SCANCODE_Z) || KeyHeld_ForTime(input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME)) {
         ResetKeyHeldTime(input, SDL_SCANCODE_Z);
@@ -102,71 +130,99 @@ void UpdateGame(Gameplay* gameplay, Input* input, const float dt) {
             Undo(gameplay->commandBuffer, GetCurrentLevel(gameplay));
         }
     }
+    bool are_entities_acting = false;
+
+    for (int i = 0; i < level->entityCount; i++) {
+        if (IsActing(&entityBuffer[i])) {
+            are_entities_acting = true;
+            break;
+        }
+    }
+
+    if (!are_entities_acting && KeyPressed(input, SDL_SCANCODE_X) && player_count > 0) {
+        SwapActiveEntityCommand swap(&gameplay->activePlayerIndex, player_count);
+        Push(gameplay->commandBuffer, swap, GetCurrentLevel(gameplay));
+        gameplay->commandBuffer->timestamp += 1;
+    }
+
+    Entity* entity = GetActiveEntity(gameplay);
+    if (!HasBehaviour(entity, (Behaviour) (RESPOND_TO_INPUT | CAN_MOVE))) {
+        return;
+    }
+    if (HasBehaviour(entity, IS_PETRIFIED)) {
+        return;
+    }
 
     //Check input for movement
     if (KeyPressed(input, SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input, SDL_SCANCODE_RIGHT,
-                                                                 (1 / MOVE_SPEED) * 1.15)) {
+                                                                 1 / MOVE_SPEED * 1.15)) {
         ResetKeyHeldTime(input, SDL_SCANCODE_RIGHT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {1, 0};
     } else if (KeyPressed(input, SDL_SCANCODE_LEFT) || KeyHeld_ForTime(
-                       input, SDL_SCANCODE_LEFT, (1 / MOVE_SPEED) * 1.15)) {
+                       input, SDL_SCANCODE_LEFT, 1 / MOVE_SPEED * 1.15)) {
         ResetKeyHeldTime(input, SDL_SCANCODE_LEFT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {-1, 0};
     } else if (KeyPressed(input, SDL_SCANCODE_UP) || KeyHeld_ForTime(
-                       input, SDL_SCANCODE_UP, (1 / MOVE_SPEED) * 1.15)) {
+                       input, SDL_SCANCODE_UP, 1 / MOVE_SPEED * 1.15)) {
         ResetKeyHeldTime(input, SDL_SCANCODE_UP);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, -1};
     } else if (KeyPressed(input, SDL_SCANCODE_DOWN) || KeyHeld_ForTime(
-                       input, SDL_SCANCODE_DOWN, (1 / MOVE_SPEED) * 1.15)) {
+                       input, SDL_SCANCODE_DOWN, 1 / MOVE_SPEED * 1.15)) {
         ResetKeyHeldTime(input, SDL_SCANCODE_DOWN);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, 1};
     }
 
-    //Update movable entities
-    bool are_entities_moving = false;
-    for (int i = 0; i < GetCurrentLevel(gameplay)->entityCount; i++) {
-        Entity* entity = &GetCurrentLevel(gameplay)->entityBuffer[i];
-        if (HasBehaviour(entity, CAN_MOVE) && IsMoving(entity)) {
-            entity->progress_01 += MOVE_SPEED * dt;
-            if (entity->progress_01 >= 1) {
-                entity->progress_01 = 0;
-                entity->x_prev = entity->x;
-                entity->y_prev = entity->y;
-            }
-            if (IsMoving(entity)) {
-                are_entities_moving = true;
-            }
+    // Is there an entity moving?
+    for (int i = 0; i < level->entityCount; i++) {
+        Entity* entity = &entityBuffer[i];
+        if (!entity->active)
+            continue;
+        switch (entity->action) {
+            case Actions::NONE:
+                continue;
+            case Actions::MOVING:
+                entity->progress_01 += MOVE_SPEED * dt;
+                break;
+            case Actions::ROTATING:
+                entity->progress_01 += 8 * dt;
+                break;
         }
     }
-
-    //Update player movement
-    if (are_entities_moving == false && gameplay->input_buffer_read_count < gameplay->input_buffer_write_count) {
-
-        for (int i = 0; i < GetCurrentLevel(gameplay)->entityCount; i++) {
-            Entity* entity = &GetCurrentLevel(gameplay)->entityBuffer[i];
+    for (int i = 0; i < level->entityCount; i++) {
+        Entity* entity = &entityBuffer[i];
+        if (entity->progress_01 >= 1) {
+            entity->x_prev = entity->x;
+            entity->y_prev = entity->y;
+            entity->facing_previous = entity->facing_current;
+            entity->action = Actions::NONE;
+            entity->progress_01 = 0;
             if (HasBehaviour(entity, IS_PUSHING)) {
                 RemoveBehaviour(entity, IS_PUSHING);
             }
-
-            if (HasBehaviour(entity, (Behaviour) (RESPOND_TO_INPUT | CAN_MOVE))) {
-                if (HasBehaviour(entity, IS_PETRIFIED)) {
-                    continue;
-                }
-                int xDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].
-                        x;
-                int yDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].
-                        y;
-                Direction new_facing = DirectionFromXY(xDir, yDir);
-                if (new_facing != entity->facing) {
-                    RotateCommand rotate(entity, entity->facing, new_facing);
-                    Push(gameplay->commandBuffer, rotate, GetCurrentLevel(gameplay));
-                }
-                TryMove(entity, GetCurrentLevel(gameplay), gameplay->commandBuffer, xDir, yDir, entity->strength);
-            }
         }
+    }
+
+
+    if (are_entities_acting) {
+        return;
+    }
+    if (gameplay->input_buffer_read_count == gameplay->input_buffer_write_count) {
+        return;
+    }
+
+    int xDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].x;
+    int yDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].y;
+    Direction new_facing = DirectionFromXY(xDir, yDir);
+    if (new_facing != entity->facing_current) {
+        RotateCommand rotate(entity, entity->facing_current, new_facing);
+        Push(gameplay->commandBuffer, rotate, level);
+        return;
+    }
+    if (!IsActing(entity)) {
+        TryMove(entity, level, gameplay->commandBuffer, xDir, yDir, entity->strength);
+        gameplay->commandBuffer->timestamp += 1;
         gameplay->input_buffer_read_count++;
     }
-    gameplay->commandBuffer->timestamp++;
 }
 
 void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer) {
@@ -231,6 +287,11 @@ void Update(GameData* data, float dt) {
         EDITOR::Update(&editorData->editor, &data->input, GetCurrentLevel(gameplay), gameplay->commandBuffer);
     }
 
+    // Dev
+    if (KeyPressed(&data->input, SDL_SCANCODE_F1)) {
+        editorData->show_dev = !editorData->show_dev;
+    }
+
     // Scene Transition
     if (transition->state != Transition::Inactive) {
         transition->fade_time_elapsed += dt;
@@ -259,7 +320,7 @@ void Update(GameData* data, float dt) {
             }
             break;
         case SCENE_TYPES::GAME:
-            UpdateGame(gameplay, &data->input, dt);
+            UpdateGame(gameplay, &data->input, data->arena_scratch, dt);
             break;
         case SCENE_TYPES::MAINMENU:
         case SCENE_TYPES::CREDITS:

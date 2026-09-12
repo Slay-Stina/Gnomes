@@ -63,7 +63,7 @@ bool LoadDLL(DLL_INFO* info, int depth = 0) {
     char command[256];
     snprintf(command, sizeof(command), "cp %s %s", NAME_OF_LIB, temp_name);
 
-    bool success = (system(command) == 0);
+    bool success = system(command) == 0;
     if (!success) {
         usleep(50 * 1000);
         return LoadDLL(info, depth + 1);
@@ -92,7 +92,7 @@ void UnloadDLL(DLL_INFO* info) {
 
 void DLL_CheckStatus(DLL_INFO* dll) {
     time_t timestamp = GetTimestamp();
-    bool is_timestamp_changed = (dll->Timestamp != timestamp);
+    bool is_timestamp_changed = dll->Timestamp != timestamp;
     if (is_timestamp_changed) {
         usleep(100 * 1000);
         UnloadDLL(dll);
@@ -115,10 +115,11 @@ void SDL_Setup() {
     renderer = SDL_CreateRenderer(window, nullptr);
 }
 
-void CalculateDeltaTime(float& dt) {
+void CalculateDeltaTime(float* dt, float scaler) {
     NOW = SDL_GetTicksNS();
-    dt = NOW - PREV;
-    dt = SDL_NS_TO_SECONDS(dt);
+    *dt = NOW - PREV;
+    *dt = SDL_NS_TO_SECONDS(*dt);
+    *dt *= scaler;
     PREV = NOW;
 }
 
@@ -183,7 +184,7 @@ int main() {
     gameData->input.keys_current = ALLOC_ARRAY(gameData->arena_input, bool, SDL_SCANCODE_COUNT);
     gameData->input.keys_previous = ALLOC_ARRAY(gameData->arena_input, bool, SDL_SCANCODE_COUNT);
     gameData->input.keys_held_time = ALLOC_ARRAY(gameData->arena_input, float, SDL_SCANCODE_COUNT);
-    gameData->input.mouse_held_time = ALLOC_ARRAY(gameData->arena_input, float, SDL_SCANCODE_COUNT);
+    gameData->input.mouse_held_time = ALLOC_ARRAY(gameData->arena_input, float, (int) MouseButtons::COUNT);
 
     DLL_INFO dll;
 
@@ -198,12 +199,14 @@ int main() {
 
     bool running = true;
     float dt;
+    float dt_scaler = 1;
     gameData->dt = &dt;
+    gameData->dt_scaler = &dt_scaler;
 
     while (running) {
         DLL_CheckStatus(&dll);
         Reset(gameData->arena_scratch);
-        CalculateDeltaTime(dt);
+        CalculateDeltaTime(&dt, dt_scaler);
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {

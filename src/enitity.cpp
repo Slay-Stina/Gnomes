@@ -4,8 +4,10 @@
 #include "entity.h"
 #include "levels.h"
 
-bool IsMoving(Entity* e) {
-    return e->x != e->x_prev || e->y != e->y_prev;
+bool IsActing(Entity* e) {
+    if (e->active == false)
+        return false;
+    return e->action != Actions::NONE;
 }
 
 bool HasBehaviour(const Entity* entity, Behaviour flags) {
@@ -18,23 +20,24 @@ void InitializeBaseBehaviour(Entity* entity) {
         default:
             SetBehaviour(entity, NONE);
             break;
-        case ENTITY_ID::DEMON:
-            SetBehaviour(entity, (Behaviour) (CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
+        case ENTITY_ID::GNOME:
+            SetBehaviour(entity, (Behaviour) (CAN_ROTATE | CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
             AddBehaviour(entity, JUMPS);
             entity->strength = 1;
             break;
         case ENTITY_ID::GOLEM:
-            SetBehaviour(entity, (Behaviour) (CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
+            SetBehaviour(entity, (Behaviour) (CAN_ROTATE | CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
             AddBehaviour(entity, UNPUSHABLE);
             entity->strength = 999;
             break;
+
         case ENTITY_ID::MEDUSA:
             SetBehaviour(entity, (Behaviour) (CAN_ROTATE | CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
             AddBehaviour(entity, JUMPS);
             entity->strength = 1;
             break;
         case ENTITY_ID::SIREN:
-            SetBehaviour(entity, (Behaviour) (CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
+            SetBehaviour(entity, (Behaviour) (CAN_ROTATE | CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
             entity->strength = 0;
             break;
         case ENTITY_ID::ROCK:
@@ -57,7 +60,7 @@ void RemoveBehaviour(Entity* entity, Behaviour flags) {
 
 void PostMove(Entity* entity, LevelData* level, CommandBuffer* buffer) {
     if (entity->id == ENTITY_ID::MEDUSA) {
-        Entity* entity_looked_at = RaycastFirstEntity(entity->x, entity->y, entity->facing, level);
+        Entity* entity_looked_at = RaycastFirstEntity(entity->x, entity->y, entity->facing_current, level);
         if (entity_looked_at != nullptr) {
             if (!HasBehaviour(entity_looked_at, IS_PETRIFIED)) {
                 ModifyBehaviourCommand modify(entity_looked_at, IS_PETRIFIED, ModifyBehaviourCommand::ADD);
