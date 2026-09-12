@@ -3,6 +3,7 @@
 
 #include <imgui.h>
 
+#include "command.h"
 #include "rendering.h"
 
 namespace EDITOR {
@@ -35,14 +36,17 @@ namespace EDITOR {
         ImGui::End();
     }
 
-    void PlaceObject(const int x, const int y, Editor* editor, LevelData* level) {
+    void PlaceObject(const int x, const int y, Editor* editor, LevelData* level, CommandBuffer* buffer) {
         if (editor->object_to_place_id == ID::NONE) {
             return;
         }
         if (editor->object_to_place_id == ID::GROUND || editor->object_to_place_id == ID::WALL) {
-            level->cells[y * level->w + x] = (int) editor->object_to_place_id;
+            uint8_t previous = level->cells[y * level->w + x];
+            EditCommand edit(x, y, editor->object_to_place_id, previous);
+            Push(buffer, edit, level);
         } else {
-            AddEntity(editor->object_to_place_id, x, y, level);
+            AddCommand add(x, y, editor->object_to_place_id);
+            Push(buffer, add, level);
         }
     }
 
@@ -52,25 +56,39 @@ namespace EDITOR {
         int y;
         camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level);
         Sprite* preview = GetSpriteFromID(editor->object_to_place_id, spriteBuffer);
-        if (preview != nullptr) {
-            RenderSprite_Grid(preview, level, renderer, camera, x, y, 1, 0.5);
+        if (preview == nullptr) {
+            return;
         }
+        if (editor->object_to_place_id == ID::GROUND || editor->object_to_place_id == ID::WALL) {
+            RenderSprite_Grid(preview, level, renderer, camera, x, y, 1, 0.5);
+        } else {
+            RenderEntity_OnTile(preview, level, renderer, camera, x, y, 1, 0.5);
+        }
+
     }
 
-    void Update(Editor* editor, Input* input, LevelData* level) {
+    void Update(Editor* editor, Input* input, LevelData* level, CommandBuffer* buffer) {
+        if (ImGui::GetIO().WantCaptureMouse) {
+            return;
+        }
         if (MousePressed(input, MouseButtons::LEFT)) {
             if (camera::GetIsPointInsideGrid(input->mouse_x, input->mouse_y, level)) {
                 int x;
                 int y;
                 camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level);
-                PlaceObject(x, y, editor, level);
+                PlaceObject(x, y, editor, level, buffer);
             }
         } else if (MousePressed(input, MouseButtons::RIGHT)) {
             if (camera::GetIsPointInsideGrid(input->mouse_x, input->mouse_y, level)) {
                 int x;
                 int y;
                 camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level);
-                RemoveEntity(x, y, level);
+                Entity* entity = GetEntity(level, x, y);
+                if (entity == nullptr) {
+                    return;
+                }
+                RemoveCommand remove(entity);
+                Push(buffer, remove, level);
             }
         }
     }

@@ -87,7 +87,7 @@ void Update(GameData* data, float dt) {
 
     //Update level editor
     if (data->edit_level) {
-        EDITOR::Update(&data->editorData, &data->input, data->GetCurrentLevel());
+        EDITOR::Update(&data->editorData, &data->input, data->GetCurrentLevel(), data->commandBuffer);
     }
 
     //Check input to undo/redo
@@ -96,7 +96,7 @@ void Update(GameData* data, float dt) {
         if (KeyHeld(&data->input, SDL_SCANCODE_LSHIFT)) {
             Redo(data->commandBuffer, data->GetCurrentLevel());
         } else {
-            Undo(data->commandBuffer);
+            Undo(data->commandBuffer, data->GetCurrentLevel());
         }
     }
 
@@ -144,7 +144,7 @@ void Update(GameData* data, float dt) {
             if (HasBehaviour(entity, IS_PUSHING)) {
                 RemoveBehaviour(entity, IS_PUSHING);
             }
-            
+
             if (HasBehaviour(entity, (Behaviour) (RESPOND_TO_INPUT | CAN_MOVE))) {
                 if (HasBehaviour(entity, IS_PETRIFIED)) {
                     continue;

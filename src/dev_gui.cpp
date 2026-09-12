@@ -21,7 +21,7 @@ void Draw_History(CommandBuffer* buffer, LevelData* level) {
     int sliderPos = buffer->index;
     if (ImGui::SliderInt("history", &sliderPos, 0, buffer->head)) {
         while (buffer->index > sliderPos) {
-            Undo(buffer);
+            Undo(buffer, level);
         }
         while (buffer->index < sliderPos) {
             Redo(buffer, level);

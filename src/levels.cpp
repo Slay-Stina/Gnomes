@@ -13,6 +13,7 @@ const int LEVEL_INDEX = 0;
 const int ENTITIES_INDEX = 1;
 
 uint8_t GetCellID(LevelData* level, int x, int y) {
+    assert(! (x < 0 || x >= level->w || y < 0 || y >= level->h));
     return level->cells[y * level->w + x];
 }
 
@@ -64,7 +65,7 @@ void CreateEntities(LevelData* lvl_data, Arena* arena) {
         }
     }
 
-    lvl_data->entityBuffer = (Entity*) Allocate(arena, sizeof(Entity) * 256);
+    lvl_data->entityBuffer = ALLOC_ARRAY(arena, Entity, MAX_NUM_ENTITIES);
     for (int i = 0; i < lvl_data->w * lvl_data->h; i++) {
         unsigned char entity_id = entityData[i].asUInt();
         if (entity_id != 0) {
@@ -81,6 +82,9 @@ Entity* GetNextAvailableEntity(LevelData* level) {
             return &level->entityBuffer[i];
         }
     }
+    if (level->entityCount >= MAX_NUM_ENTITIES) {
+        return nullptr;
+    }
     return &level->entityBuffer[level->entityCount++];
 }
 
@@ -88,6 +92,9 @@ void AddEntity(ID entity_id, int x, int y, LevelData* level) {
     Entity* entity = GetEntity(level, x, y);
     if (entity == nullptr) {
         entity = GetNextAvailableEntity(level);
+        if (entity == nullptr) {
+            return;
+        }
     }
     entity->x = x;
     entity->y = y;
@@ -103,6 +110,8 @@ void RemoveEntity(int x, int y, LevelData* level) {
         return;
     }
     *entity = {};
+    entity->x = -1;
+    entity->y = -1;
 }
 
 Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, LevelData* level, bool ignore_walls) {
@@ -123,7 +132,7 @@ Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, Leve
     }
     int x_search = x_origin + facingVector.x;
     int y_search = y_origin + facingVector.y;
-    while (x_search > 0 && x_search < level->w && y_search > 0 && y_search < level->h) {
+    while (x_search >= 0 && x_search < level->w && y_search >= 0 && y_search < level->h) {
         ID cellID = (ID) GetCellID(level, x_search, y_search);
         if (cellID == ID::WALL && !ignore_walls) {
             break;
