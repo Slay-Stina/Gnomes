@@ -67,9 +67,9 @@ struct ModifyBehaviourCommand : Command {
 struct AddCommand : Command {
     int x;
     int y;
-    ID id;
+    ENTITY_ID id;
 
-    AddCommand(int _x, int _y, ID _id) {
+    AddCommand(int _x, int _y, ENTITY_ID _id) {
         x = _x;
         y = _y;
         id = _id;
@@ -81,7 +81,7 @@ struct RemoveCommand : Command {
     int x;
     int y;
     Behaviour storedBehaviour;
-    ID storedID;
+    ENTITY_ID storedID;
 
     RemoveCommand(Entity* entity) {
         x = entity->x;
@@ -95,10 +95,10 @@ struct RemoveCommand : Command {
 struct EditCommand : Command {
     int x;
     int y;
-    ID id;
+    ENTITY_ID id;
     uint8_t previous;
 
-    EditCommand(int _x, int _y, ID _id, uint8_t prev) {
+    EditCommand(int _x, int _y, ENTITY_ID _id, uint8_t prev) {
         x = _x;
         y = _y;
         id = _id;

@@ -11,19 +11,22 @@ struct Sprite {
     int height;
     int pivot_x;
     int pivot_y;
+    int tileset_cell_count_x;
+    int tileset_cell_count_y;
 };
 
 enum class SPRITE_ID {
-    Fallback, Ground, Ground_alt, Wall, Rock, Demon,
+    Fallback, Rock, Demon,
     Medusa_Idle_Side, Medusa_Idle_Front, Medusa_Idle_Back,
-    Golem, Siren, Dropshadow, titlescreen_background, black_1x1, COUNT // COUNT = antal, sista värdet
+    Golem, Siren, Dropshadow, titlescreen_background, black_1x1,
+    dungeon_tileset, COUNT // COUNT = antal, sista värdet
 };
 
 class SpriteLibrary {
 public:
     void LoadAll(SDL_Renderer* renderer, Memory::Arena* arena);
 
-    Sprite* Get(ID id) const;
+    Sprite* Get(ENTITY_ID id) const;
 
     Sprite* GetFromEntity(const Entity* entity) const;
 

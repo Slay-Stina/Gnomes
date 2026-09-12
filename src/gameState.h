@@ -70,6 +70,7 @@ struct GameData {
     EditorData editor_data;
     Input input;
     SpriteLibrary sprites;
+    Tileset* tilesetBuffer;
     Arena* arena_main;
     Arena* arena_levels;
     Arena* arena_entities;

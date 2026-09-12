@@ -5,20 +5,25 @@
 
 #include "rendering.h"
 
-void RenderLevel(GameData* data, SDL_Renderer* renderer) {
-    Gameplay* gameplay = &data->scenes.gameplay;
-    LevelData* lvl = GetCurrentLevel(gameplay);
-    for (int x = 0; x < lvl->w; x++) {
-        for (int y = 0; y < lvl->h; y++) {
-            uint8_t cellType = GetCellID(lvl, x, y);
-            Sprite* sprite;
-            if (ID(cellType) == ID::GROUND) {
-                SPRITE_ID floorId = (x + y) % 2 == 0 ? SPRITE_ID::Ground : SPRITE_ID::Ground_alt;
-                sprite = data->sprites.GetBySpriteID(floorId);
-            } else {
-                sprite = data->sprites.Get((ID) cellType);
-            }
-            RenderSprite_Grid(sprite, lvl, renderer, &data->camera, x, y);
+void RenderLevel(GameData* gameData, SDL_Renderer* renderer) {
+    Gameplay* gameplay = &gameData->scenes.gameplay;
+    LevelData* level = GetCurrentLevel(gameplay);
+
+    Sprite* tileset;
+    switch (level->tileset->type) {
+        case TILESETS::Dungeon:
+            tileset = gameData->sprites.GetBySpriteID(SPRITE_ID::dungeon_tileset);
+            break;
+        case TILESETS::NONE:
+        case TILESETS::COUNT:
+            assert(false);
+            break;
+    }
+
+    for (int x = 0; x < level->w; x++) {
+        for (int y = 0; y < level->h; y++) {
+            uint16_t id = GetCellID(level, x, y);
+            RenderTile_World(tileset, id, level, renderer, &gameData->camera, x, y, 1, 1);
         }
     }
 }
@@ -38,12 +43,12 @@ void RenderEntities(GameData* data, SDL_Renderer* renderer) {
     sort(sortedEntities, sortedEntities + lvl->entityCount, IsEntityBelowOtherEntity);
     for (int i = 0; i < lvl->entityCount; i++) {
         Entity* entity = sortedEntities[i];
-        if (entity->id == ID::NONE) {
+        if (!entity->active) {
             continue;
         }
         Sprite* sprite = data->sprites.GetFromEntity(entity);
         if (HasBehaviour(entity, IS_PETRIFIED)) {
-            sprite = data->sprites.Get(ID::ROCK);
+            sprite = data->sprites.Get(ENTITY_ID::ROCK);
         }
         float x_animated = std::lerp(entity->x_prev, entity->x, entity->progress_01);
         float y_animated = std::lerp(entity->y_prev, entity->y, entity->progress_01);

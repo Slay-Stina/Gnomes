@@ -3,6 +3,8 @@
 #include "entity.h"
 
 #include <cstdint>
+
+#include "tilesetLibrary.h"
 using namespace std;
 
 using namespace Memory;
@@ -12,23 +14,26 @@ const int MAX_NUM_ENTITIES = 256;
 struct LevelData {
     int w;
     int h;
-    uint8_t* cells;
+    int entityCount;
+    uint16_t* cells;
     const char* level_path;
     Entity* entityBuffer;
-    int entityCount;
+    const Tileset* tileset;
 };
 
-void CreateLevel(Arena* arena, LevelData* level, const char* level_name);
+void CreateLevel(Arena* arena, LevelData* level, const Tileset* tileset, const char* level_name);
 
 void CreateEntities(LevelData* lvl_data, Arena* arena);
 
 Entity* GetNextAvailableEntity(LevelData* level);
 
-void AddEntity(ID entity_id, int x, int y, LevelData* level);
+void AddEntity(ENTITY_ID entity_id, int x, int y, LevelData* level);
 
 void RemoveEntity(int x, int y, LevelData* level);
 
-uint8_t GetCellID(LevelData* level, int x, int y);
+uint16_t GetCellID(LevelData* level, int x, int y);
+
+bool IsWalkable(int x, int y, LevelData* level);
 
 Entity* GetEntity(LevelData* level, int x, int y);
 

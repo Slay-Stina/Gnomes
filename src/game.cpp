@@ -30,10 +30,9 @@ bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDi
     int test_x = mover->x + xDir;
     int test_y = mover->y + yDir;
     Entity* stepInto_entity = GetEntity(level, test_x, test_y);
-    ID stepInto_tile_id = (ID) GetCellID(level, test_x, test_y);
 
     if (stepInto_entity == nullptr) {
-        if (stepInto_tile_id == ID::GROUND) {
+        if (IsWalkable(test_x, test_y, level)) {
             MoveCommand mv(mover, xDir, yDir);
             Push(cmd_buffer, mv, level);
             return true;
@@ -85,11 +84,11 @@ void ChangeScene(GameData* data, SCENE_TYPES new_scene) {
     }
 }
 
-void InitializeGame(Gameplay* gameplay, Arena* arena_levels) {
+void InitializeGame(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer) {
     assert(gameplay->initialized == false);
-    gameplay->currentLevelIndex = 1;
-    CreateLevel(arena_levels, &gameplay->levels[0], "assets/levels/testLevel.tmj");
-    CreateLevel(arena_levels, &gameplay->levels[1], "assets/levels/testLevel_box.tmj");
+    gameplay->currentLevelIndex = 0;
+    CreateLevel(arena_levels, &gameplay->levels[0], &tilesetBuffer[(int) TILESETS::Dungeon],
+                "assets/levels/testing.tmj");
     gameplay->initialized = true;
 }
 
@@ -195,10 +194,11 @@ extern "C" {
 void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer) {
     DEV::Initialize(window, renderer);
     data->sprites.LoadAll(renderer, data->arena_images);
+    AssetManagement::LoadAllTilesets(data->tilesetBuffer, data->arena_images);
     data->imGui_context = ImGui::GetCurrentContext();
     SDL_Texture* blackfade = data->sprites.GetBySpriteID(SPRITE_ID::black_1x1)->texture;
     SDL_SetTextureBlendMode(blackfade, SDL_BLENDMODE_BLEND);
-    InitializeGame(&data->scenes.gameplay, data->arena_levels);
+    InitializeGame(&data->scenes.gameplay, data->arena_levels, data->tilesetBuffer);
     ChangeScene(data, SCENE_TYPES::TITLESCREEN);
 }
 
@@ -211,12 +211,9 @@ bool HandleEvents(Arena* arena, SDL_Event& event) {
         if (event.key.key == SDLK_L) {
             RetrieveGameState(arena);
         }
-    }
-    if (event.key.key == SDLK_ESCAPE) {
-        return false;
-    }
-    if (event.type != SDL_EVENT_KEY_DOWN) {
-        return true;
+        if (event.key.key == SDLK_ESCAPE) {
+            return false;
+        }
     }
     return true;
 }
@@ -298,5 +295,9 @@ void Draw(GameData* data, SDL_Renderer* renderer) {
     }
     DEV::Draw(data, renderer);
     SDL_RenderPresent(renderer);
+}
+
+void OnQuit(SDL_Renderer* renderer) {
+    SDL_DestroyRenderer(renderer);
 }
 }

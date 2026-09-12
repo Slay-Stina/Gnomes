@@ -4,7 +4,8 @@
 #include "spriteLibrary.h"
 
 struct Editor {
-    ID object_to_place_id;
+    ENTITY_ID object_to_place_id;
+    bool has_selection = false;
 };
 
 namespace EDITOR {
