@@ -1,6 +1,6 @@
 #pragma once
 #include <SDL3/SDL_render.h>
-
+#include "arena.h"
 #include "entity.h"
 
 const int NOT_SET = -1;
@@ -14,33 +14,21 @@ struct Sprite {
 };
 
 enum class SPRITE_ID {
-    Fallback,
-    Ground,
-    Ground_alt,
-    Wall,
-    Rock,
-    Demon,
-    Medusa_Idle_Side,
-    Medusa_Idle_Front,
-    Medusa_Idle_Back,
-    Golem,
-    Siren,
-    Dropshadow
+    Fallback, Ground, Ground_alt, Wall, Rock, Demon,
+    Medusa_Idle_Side, Medusa_Idle_Front, Medusa_Idle_Back,
+    Golem, Siren, Dropshadow, COUNT // COUNT = antal, sista värdet
 };
 
-struct SpriteDataEntry {
-    SPRITE_ID id;
-    const char* path;
-    int pivot_x = NOT_SET;
-    int pivot_y = NOT_SET;
+class SpriteLibrary {
+public:
+    void LoadAll(SDL_Renderer* renderer, Memory::Arena* arena);
+
+    Sprite* Get(ID id) const;
+
+    Sprite* GetFromEntity(const Entity* entity) const;
+
+    Sprite* GetBySpriteID(SPRITE_ID id) const;
+
+private:
+    Sprite* sprites[(int) SPRITE_ID::COUNT] = {};
 };
-
-Sprite* GetSpriteFromID(ID id, Sprite* spriteBuffer);
-
-Sprite* GetSprite_FromEntityState(Entity* entity, Sprite* spriteBuffer);
-
-namespace AssetManagement {
-    void LoadSprite(Sprite* spriteBuffer, SpriteDataEntry entry, SDL_Renderer* renderer);
-
-    void LoadAllSprites(Sprite* spriteBuffer, SDL_Renderer* renderer);
-}

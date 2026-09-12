@@ -1,19 +1,35 @@
 #include "dev_gui.h"
 #include "gameState.h"
 #include "command.h"
+#include "common.h"
 #include <SDL3/SDL.h>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
+#include <cstdio>
 #include <string>
 
 using namespace std;
 
-void Draw_Imgui_Arena_Usage(Arena* arena, std::string name_of_arena) {
+namespace {
+    string FormatBytes(size_t bytes) {
+        char buf[32];
+        if (bytes >= GIGABYTES(1)) {
+            snprintf(buf, sizeof(buf), "%.1f GB", AS_GIGABYTES(bytes));
+        } else if (bytes >= MEGABYTES(1)) {
+            snprintf(buf, sizeof(buf), "%.1f MB", AS_MEGABYTES(bytes));
+        } else if (bytes >= KILOBYTES(1)) {
+            snprintf(buf, sizeof(buf), "%.1f KB", AS_KILOBYTES(bytes));
+        } else {
+            snprintf(buf, sizeof(buf), "%zu B", bytes);
+        }
+        return buf;
+    }
+}
+
+void Draw_Imgui_Arena_Usage(Arena* arena, const std::string& name_of_arena) {
     float fraction = (float) arena->used / (float) arena->size;
-    string barText = name_of_arena;
-    barText += " " + to_string(arena->used);
-    barText += " / " + to_string(arena->size);
+    string barText = name_of_arena + " " + FormatBytes(arena->used) + " / " + FormatBytes(arena->size);
     ImGui::ProgressBar(fraction, ImVec2(-1, 0), barText.c_str());
 }
 
@@ -59,6 +75,7 @@ void DEV::PreDraw(ImGuiContext* saved_context) {
 void DEV::Draw(GameData* data, SDL_Renderer* renderer) {
     ImGui::Begin("Dev Tools");
     ImGui::Text("memory arena usage");
+    Draw_Imgui_Arena_Usage(data->arena_main, "total");
     Draw_Imgui_Arena_Usage(data->arena_images, "images");
     Draw_Imgui_Arena_Usage(data->arena_levels, "levels");
     Draw_Imgui_Arena_Usage(data->arena_commands, "commands");
@@ -67,9 +84,9 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer) {
     DrawFPS(*data->dt);
     ImGui::End();
     if (data->edit_level) {
-        EDITOR::DrawObjectPanel(&data->editorData, data->spriteBuffer);
+        EDITOR::DrawObjectPanel(&data->editorData, data->sprites);
         EDITOR::DrawPreview(&data->editorData, &data->input, renderer, data->GetCurrentLevel(), &data->camera,
-                            data->spriteBuffer);
+                            data->sprites);
     }
     ImGui::Render();
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);

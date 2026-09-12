@@ -53,7 +53,7 @@ extern "C" {
 void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer) {
     DEV::Initialize(window, renderer);
     data->imGui_context = ImGui::GetCurrentContext();
-    AssetManagement::LoadAllSprites(data->spriteBuffer, renderer);
+    data->sprites.LoadAll(renderer, data->arena_images);
     data->currentLevel = 1;
     CreateLevel(data->arena_levels, &data->levels[0], "assets/levels/testLevel.tmj");
     CreateLevel(data->arena_levels, &data->levels[1], "assets/levels/testLevel_box.tmj");

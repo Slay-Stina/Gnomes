@@ -8,12 +8,12 @@ struct Editor {
 };
 
 namespace EDITOR {
-    void DrawObjectPanel(Editor* editor, Sprite* spriteBuffer);
+    void DrawObjectPanel(Editor* editor, SpriteLibrary& sprites);
 
     void PlaceObject(const int x, const int y, Editor* editor, LevelData* level, CommandBuffer* commandbuffer);
 
     void Update(Editor* editor, Input* input, LevelData* level, CommandBuffer* buffer);
 
     void DrawPreview(Editor* editor, Input* input, SDL_Renderer* renderer, LevelData* level, Camera* camera,
-                     Sprite* spriteBuffer);
+                     SpriteLibrary& sprites);
 }

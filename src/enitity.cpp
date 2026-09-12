@@ -8,7 +8,7 @@ bool IsMoving(Entity* e) {
     return e->x != e->x_prev || e->y != e->y_prev;
 }
 
-bool HasBehaviour(Entity* entity, Behaviour flags) {
+bool HasBehaviour(const Entity* entity, Behaviour flags) {
     return (entity->behaviour & flags) == flags;
 }
 

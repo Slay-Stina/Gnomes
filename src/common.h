@@ -6,6 +6,10 @@
 #define MEGABYTES(n) (KILOBYTES(n) * 1024)
 #define GIGABYTES(n) (MEGABYTES(n) * 1024)
 
+#define AS_KILOBYTES(b) ((double) (b) / KILOBYTES(1))
+#define AS_MEGABYTES(b) (AS_KILOBYTES(b) / 1024.0)
+#define AS_GIGABYTES(b) (AS_MEGABYTES(b) / 1024.0)
+
 constexpr size_t GAME_MEMORY_ALLOWANCE = MEGABYTES(10);
 
 constexpr int TARGET_FPS = 60;
