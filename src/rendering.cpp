@@ -1,6 +1,16 @@
 #include "rendering.h"
 
+#include "button.h"
 #include "common.h"
+
+void RenderButton(Button* button, bool is_selected, SDL_Renderer* renderer) {
+    SDL_Texture* texture = button->texture;
+    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_PIXELART);
+    uint8_t colorOverlay = is_selected ? 255 : 230;
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureColorMod(texture, colorOverlay, colorOverlay, colorOverlay);
+    SDL_RenderTexture(renderer, button->texture, nullptr, &button->rect);
+}
 
 void RenderTile(Sprite* tileset, int cell_id, LevelData* level, SDL_Renderer* renderer,
                 const Camera* camera, float x, float y, float scale, float alpha) {
@@ -44,8 +54,10 @@ void RenderSprite_World(SpriteRenderInfo spriteRenderInfo, SDL_Renderer* rendere
     rect.w = tilesetRect.w * final_scale;
     rect.x -= sprite->pivot_x * final_scale;
     rect.y -= sprite->pivot_y * final_scale;
-    rect.x -= camera->camera_x;
-    rect.y -= camera->camera_y;
+    if (camera != nullptr) {
+        rect.x -= camera->camera_x;
+        rect.y -= camera->camera_y;
+    }
 
     SDL_SetTextureScaleMode(sprite->texture, SDL_SCALEMODE_PIXELART);
     SDL_SetTextureAlphaModFloat(sprite->texture, alpha);

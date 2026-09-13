@@ -1,26 +1,41 @@
 #pragma once
-#include "arena.h"
-#include "gameState.h"
+
 #include <SDL3/SDL_render.h>
 
-void StoreGameState(Arena* arena);
+#include "arena.h"
+#include "entity.h"
+#include "input.h"
+#include "levels.h"
 
-void RetrieveGameState(Arena* arena);
+struct GameData;
+struct Tileset;
 
-bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDir, int yDir, int strength);
+struct Gameplay {
+    CommandBuffer* commandBuffer;
+    LevelData* levels;
+    int levelCount;
+    int currentLevelIndex;
+    Position* input_buffer;
+    int input_buffer_capacity;
+    int input_buffer_write_count;
+    int input_buffer_read_count;
+    bool initialized;
+    int activePlayerIndex;
+    Entity** activePlayerBuffer;
+};
 
-void ChangeScene(GameData* data, SCENE_TYPES new_scene);
+inline LevelData* GetCurrentLevel(Gameplay* game) {
+    return &game->levels[game->currentLevelIndex];
+}
 
-void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer);
+inline Entity* GetActiveEntity(Gameplay* game) {
+    return game->activePlayerBuffer[game->activePlayerIndex];
+}
 
-extern "C" {
-void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer);
+namespace Game {
+    void Initialize(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer);
 
-bool HandleEvents(Arena* arena, SDL_Event& event);
+    void Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, float dt);
 
-void Draw(GameData* data, SDL_Renderer* renderer);
-
-void Update(GameData* data, float dt);
-
-void OnQuit(SDL_Renderer* renderer);
+    void Draw(GameData* data, SDL_Renderer* renderer);
 }

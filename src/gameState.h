@@ -6,24 +6,9 @@
 #include "command.h"
 #include <imgui.h>
 
+#include "game.h"
 #include "levelEditor.h"
-
-struct Gameplay {
-    CommandBuffer* commandBuffer;
-    LevelData* levels;
-    int levelCount;
-    int currentLevelIndex;
-    Position* input_buffer;
-    int input_buffer_capacity;
-    int input_buffer_write_count;
-    int input_buffer_read_count;
-    bool initialized;
-    int activePlayerIndex;
-    Entity** activePlayerBuffer;
-};
-
-struct MainMenu {
-};
+#include "mainmenu.h"
 
 struct TitleScreen {
 };
@@ -57,7 +42,7 @@ struct Scenes {
     Gameplay gameplay;
     MainMenu mainMenu;
     TitleScreen titlescreen;
-    Credits credts;
+    Credits credits;
 };
 
 enum class SCENE_TYPES : uint8_t {
@@ -69,6 +54,7 @@ enum class SCENE_TYPES : uint8_t {
 };
 
 struct GameData {
+    bool running;
     const float* dt;
     float* dt_scaler;
     SCENE_TYPES scene_current;
@@ -89,11 +75,3 @@ struct GameData {
     Camera camera;
     ImGuiContext* imGui_context;
 };
-
-inline LevelData* GetCurrentLevel(Gameplay* game) {
-    return &game->levels[game->currentLevelIndex];
-}
-
-inline Entity* GetActiveEntity(Gameplay* game) {
-    return game->activePlayerBuffer[game->activePlayerIndex];
-}

@@ -3,6 +3,10 @@
 #include "camera.h"
 #include "levels.h"
 
+struct Button;
+
+void RenderButton(Button* button, bool is_selected, SDL_Renderer* renderer);
+
 void RenderTile(Sprite* tileset, int cell_id, LevelData* level, SDL_Renderer* renderer,
                 const Camera* camera, float x, float y, float scale, float alpha);
 
