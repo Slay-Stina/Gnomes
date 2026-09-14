@@ -22,6 +22,7 @@ struct Gameplay {
     bool initialized;
     int activePlayerIndex;
     Entity** activePlayerBuffer;
+    float level_complete_timer;
 };
 
 inline LevelData* GetCurrentLevel(Gameplay* game) {
@@ -35,7 +36,10 @@ inline Entity* GetActiveEntity(Gameplay* game) {
 namespace Game {
     void Initialize(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer);
 
-    void Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, float dt);
+    void Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena* arena_commands, Arena* arena_entities,
+                float dt);
 
     void Draw(GameData* data, SDL_Renderer* renderer);
+
+    void StartLevel(Gameplay* gameplay, Arena* arena_commands, Arena* arena_entities);
 }

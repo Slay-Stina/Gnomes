@@ -26,6 +26,12 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer) {
             RenderTile(tileset, id, level, renderer, &gameData->camera, x, y, 1, 1);
         }
     }
+    for (int i = 0; i < level->goalCount; i++) {
+        Goal goal = level->goals[i];
+        Sprite* sprite = gameData->sprites.GetBySpriteID(SPRITE_ID::Goal);
+        int frame = (int) (goal.blink_timer / 0.2) % (sprite->sprite_count_x * sprite->sprite_count_y);
+        RenderSprite_OnTile({frame, sprite}, level, renderer, &gameData->camera, goal.x, goal.y);
+    }
 }
 
 bool IsEntityBelowOtherEntity(Entity* a, Entity* b) {

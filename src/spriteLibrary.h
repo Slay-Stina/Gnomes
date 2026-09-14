@@ -57,7 +57,7 @@ struct SpriteRenderInfo {
 enum class SPRITE_ID {
     Fallback, Rock, Gnome_Rotate, Medusa_Rotate, Golem, Siren,
     Dropshadow, titlescreen_background, black_1x1,
-    dungeon_tileset, selection_marker, COUNT // COUNT = antal, sista värdet
+    dungeon_tileset, selection_marker, Goal, COUNT // COUNT = antal, sista värdet
 };
 
 class SpriteLibrary {

@@ -153,3 +153,5 @@ void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* level);
 void Undo(CommandBuffer* buffer, LevelData* level);
 
 void Redo(CommandBuffer* buffer, LevelData* level);
+
+void ResetCommandBuffer(CommandBuffer* buffer);
