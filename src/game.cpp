@@ -44,11 +44,18 @@ void Game::Initialize(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetB
     gameplay->currentLevelIndex = 0;
     gameplay->activePlayerIndex = 0;
     CreateLevel(arena_levels, &gameplay->levels[0], &tilesetBuffer[(int) TILESETS::Dungeon],
-                "assets/levels/testing.tmj");
+                "assets/levels/Level_01.tmj");
+    CreateLevel(arena_levels, &gameplay->levels[1], &tilesetBuffer[(int) TILESETS::Dungeon],
+                "assets/levels/Level_02.tmj");
     gameplay->initialized = true;
 }
 
-void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, float dt) {
+void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena* arena_commands, Arena* arena_entities,
+                  float dt) {
+    if (KeyPressed(input, SDL_SCANCODE_R)) {
+        StartLevel(gameplay, arena_commands, arena_entities);
+        return;
+    }
     LevelData* level = GetCurrentLevel(gameplay);
     Entity* entityBuffer = level->entityBuffer;
 
@@ -91,6 +98,40 @@ void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, float 
         if (IsActing(&entityBuffer[i])) {
             are_entities_acting = true;
             break;
+        }
+    }
+
+    for (int i = 0; i < level->goalCount; i++) {
+        Entity* entity = GetEntity(level, level->goals[i].x, level->goals[i].y);
+        if (entity != nullptr && !IsActing(entity)) {
+            level->goals[i].blink_timer += dt;
+        } else {
+            level->goals[i].blink_timer = 0;
+        }
+    }
+
+    if (level->goalCount > 0) {
+        int goals_reached = 0;
+        for (int i = 0; i < level->goalCount; i++) {
+            Goal goal = level->goals[i];
+            Entity* entity = GetEntity(level, goal.x, goal.y);
+            if (entity == nullptr) {
+                break;
+            }
+            if (!IsActing(entity) && HasBehaviour(entity, IS_PLAYER)) {
+                goals_reached++;
+            }
+        }
+        
+        if (goals_reached == level->goalCount) {
+            gameplay->level_complete_timer += dt;
+            if (gameplay->level_complete_timer >= LEVEL_COMPLETE_DELAY) {
+                gameplay->currentLevelIndex++;
+                StartLevel(gameplay, arena_commands, arena_entities);
+                return;
+            }
+        } else {
+            gameplay->level_complete_timer = 0;
         }
     }
 
@@ -183,4 +224,12 @@ void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, float 
 void Game::Draw(GameData* data, SDL_Renderer* renderer) {
     RenderLevel(data, renderer);
     RenderEntities(data, renderer);
+}
+
+void Game::StartLevel(Gameplay* gameplay, Arena* arena_commands, Arena* arena_entities) {
+    ResetCommandBuffer(gameplay->commandBuffer);
+    Reset(arena_commands);
+    CreateEntities(&gameplay->levels[gameplay->currentLevelIndex], arena_entities);
+    gameplay->activePlayerIndex = 0;
+    gameplay->level_complete_timer = 0;
 }

@@ -22,5 +22,16 @@ const int TILE_SIZE_PX_SCALED = TILE_SIZE_PX_RAW * UPSCALE_FACTOR;
 
 const float MOVE_SPEED = 6.0;
 const float UNDO_REPEAT_TIME = 0.15;
+const float LEVEL_COMPLETE_DELAY = 0.3f;
 
 const int MOUSE_BUTTON_COUNT = 3;
+
+inline void Expand1DTo2D(int flatIndex, int width, int* x, int* y) {
+    *x = flatIndex % width;
+    *y = flatIndex / width;
+}
+
+inline void Expand1DTo2D(int flatIndex, int width, float* x, float* y) {
+    *x = (float) (flatIndex % width);
+    *y = (float) (flatIndex / width);
+}

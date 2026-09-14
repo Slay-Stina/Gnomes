@@ -19,11 +19,6 @@ void RetrieveGameState(Arena* arena) {
     file.read(reinterpret_cast<char*>(arena->base), arena->size);
 }
 
-void StartLevel(Gameplay* gameplay, Arena* arena_commands, Arena* arena_entities) {
-    Reset(arena_commands);
-    CreateEntities(&gameplay->levels[gameplay->currentLevelIndex], arena_entities);
-}
-
 void ChangeScene(GameData* data, SCENE_TYPES new_scene) {
     assert(new_scene != data->scene_current);
     data->scene_previous = data->scene_current;
@@ -42,7 +37,7 @@ void ChangeScene(GameData* data, SCENE_TYPES new_scene) {
             data->transition.fade_time_duration = 0.5f;
             Gameplay* gameplay = &data->scenes.gameplay;
             assert(gameplay->initialized);
-            StartLevel(gameplay, data->arena_commands, data->arena_entities);
+            Game::StartLevel(gameplay, data->arena_commands, data->arena_entities);
             break;
         }
         case SCENE_TYPES::CREDITS:
@@ -150,7 +145,7 @@ void Update(GameData* data, float dt) {
             }
             break;
         case SCENE_TYPES::GAME:
-            Game::Update(gameplay, &data->input, data->arena_scratch, dt);
+            Game::Update(gameplay, &data->input, data->arena_scratch, data->arena_commands, data->arena_entities, dt);;
             break;
         case SCENE_TYPES::MAINMENU:
             Menu::Update(data);

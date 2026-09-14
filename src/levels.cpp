@@ -7,6 +7,8 @@
 #include <fstream>
 #include <json/json.h>
 
+#include "common.h"
+
 using namespace std;
 
 const int LEVEL_INDEX = 0;
@@ -38,26 +40,12 @@ void CreateLevel(Arena* arena, LevelData* level, const Tileset* tileset, const c
     if (!Json::parseFromStream(reader, stream, &result, nullptr)) {
         return;
     }
-
-    // Hitta lagret som heter "level"
-    const Json::Value* levelLayer = nullptr;
-    for (const Json::Value& layer: result["layers"]) {
-        if (layer["name"].asString() == "level") {
-            levelLayer = &layer;
-            break;
-        }
-    }
-    assert(levelLayer != nullptr);
-    const Json::Value& levelData = (*levelLayer)["data"];
+    bool found = false;
+    vector<uint16_t> levelData = AssetManagement::GetCellDataFromJsonLayer(result, "level", &found);
+    assert(found);
 
     // Hitta första icke-noll-id för att bestämma tileset-offset
-    int first_non_zero_id = 0;
-    for (const Json::Value& value: levelData) {
-        if (value.asInt() != 0) {
-            first_non_zero_id = value.asInt();
-            break;
-        }
-    }
+    int first_non_zero_id = AssetManagement::GetFirstNonZeroCell(&levelData);
     int id_offset = Get_Tileset_ID_Offset_From_Tilemap(first_non_zero_id, result);
 
     level->w = result["width"].asInt();
@@ -67,11 +55,44 @@ void CreateLevel(Arena* arena, LevelData* level, const Tileset* tileset, const c
     level->cells = ALLOC_ARRAY(arena, uint16_t, level->w * level->h);
 
     for (int i = 0; i < level->w * level->h; i++) {
-        int local_id = levelData[i].asInt() - id_offset;
+        int local_id = levelData[i] - id_offset;
         if (local_id < 0) {
             local_id = 0;
         }
         level->cells[i] = local_id;
+    }
+    
+    level->goals = nullptr;
+    level->goalCount = 0;
+    bool foundGoals = false;
+    vector<uint16_t> onLevel = AssetManagement::GetCellDataFromJsonLayer(result, "on_level", &foundGoals);
+    if (foundGoals) {
+        int firstNonZero = AssetManagement::GetFirstNonZeroCell(&onLevel);
+        int goal_offset = Get_Tileset_ID_Offset_From_Tilemap(firstNonZero, result);
+
+        for (int i = 0; i < level->w * level->h; i++) {
+            int local_id = onLevel[i] - goal_offset + 1;
+            if (local_id > 0) {
+                level->goalCount++;
+            }
+        }
+
+        level->goals = ALLOC_ARRAY(arena, Goal, level->goalCount);
+        int index = 0;
+        for (int i = 0; i < level->w * level->h; i++) {
+            int local_id = onLevel[i] - goal_offset + 1;
+            if (local_id < 0) {
+                local_id = 0;
+            }
+            if (local_id != 0) {
+                int x;
+                int y;
+                Expand1DTo2D(i, level->w, &x, &y);
+                level->goals[index].x = x;
+                level->goals[index].y = y;
+                index++;
+            }
+        }
     }
 }
 
@@ -86,27 +107,20 @@ void CreateEntities(LevelData* lvl_data, Arena* arena) {
     if (!Json::parseFromStream(reader, stream, &result, nullptr)) {
         return;
     }
-
-    const Json::Value* entityLayer = nullptr;
-    for (const Json::Value& layer: result["layers"]) {
-        if (layer["name"].asString() == "entities") {
-            entityLayer = &layer;
-            break;
-        }
-    }
-    if (entityLayer == nullptr) {
+    bool found = false;
+    vector<uint16_t> entities = AssetManagement::GetCellDataFromJsonLayer(result, "entities", &found);
+    if (!found)
         return;
-    }
-    const Json::Value& entities = (*entityLayer)["data"];
 
     for (int i = 0; i < lvl_data->w * lvl_data->h; i++) {
-        int raw = entities[i].asInt();
+        int raw = entities[i];
         if (raw == 0) {
             continue;
         }
         uint16_t entity_id = GetLocalTileID(raw, result);
-        int x = i % lvl_data->w;
-        int y = i / lvl_data->w;
+        int x;
+        int y;
+        Expand1DTo2D(i, lvl_data->w, &x, &y);
         AddEntity((ENTITY_ID) entity_id, x, y, lvl_data);
     }
 }
@@ -179,4 +193,32 @@ Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, Leve
         y_search += facingVector.y;
     }
     return nullptr;
+}
+
+namespace AssetManagement {
+    std::vector<uint16_t>
+    GetCellDataFromJsonLayer(const Json::Value& parsedJson, const char* layerName, bool* wasFound) {
+        std::vector<uint16_t> result;
+        *wasFound = false;
+        for (const Json::Value& layer: parsedJson["layers"]) {
+            if (layer["name"].asString() == layerName) {
+                for (const Json::Value& value: layer["data"]) {
+                    result.push_back((uint16_t) value.asUInt());
+                }
+                *wasFound = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    int GetFirstNonZeroCell(std::vector<uint16_t>* list) {
+        for (uint16_t id: *list) {
+            if (id != 0) {
+                return id;
+            }
+        }
+        assert(false);
+        return -1;
+    }
 }

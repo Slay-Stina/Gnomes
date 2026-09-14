@@ -3,13 +3,24 @@
 #include "entity.h"
 
 #include <cstdint>
+#include <vector>
 
 #include "tilesetLibrary.h"
 using namespace std;
 
 using namespace Memory;
 
+namespace Json {
+    class Value;
+}
+
 const int MAX_NUM_ENTITIES = 256;
+
+struct Goal {
+    int x;
+    int y;
+    float blink_timer;
+};
 
 struct LevelData {
     int w;
@@ -19,6 +30,8 @@ struct LevelData {
     const char* level_path;
     Entity* entityBuffer;
     const Tileset* tileset;
+    Goal* goals;
+    int goalCount;
 };
 
 void CreateLevel(Arena* arena, LevelData* level, const Tileset* tileset, const char* level_name);
@@ -39,3 +52,10 @@ Entity* GetEntity(LevelData* level, int x, int y);
 
 Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, LevelData* level,
                            bool ignore_walls = false);
+
+namespace AssetManagement {
+    std::vector<uint16_t>
+    GetCellDataFromJsonLayer(const Json::Value& parsedJson, const char* layerName, bool* wasFound);
+
+    int GetFirstNonZeroCell(std::vector<uint16_t>* list);
+}
