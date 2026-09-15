@@ -122,7 +122,7 @@ void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena*
                 goals_reached++;
             }
         }
-        
+
         if (goals_reached == level->goalCount) {
             gameplay->level_complete_timer += dt;
             if (gameplay->level_complete_timer >= LEVEL_COMPLETE_DELAY) {
@@ -215,7 +215,10 @@ void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena*
         return;
     }
     if (!IsActing(entity)) {
-        TryMove(entity, level, gameplay->commandBuffer, xDir, yDir, entity->strength);
+        bool moved = TryMove(entity, level, gameplay->commandBuffer, xDir, yDir, entity->strength);
+        if (moved) {
+            PlaySFX(SFX_ID::JUMP);
+        }
         gameplay->commandBuffer->timestamp += 1;
         gameplay->input_buffer_read_count++;
     }

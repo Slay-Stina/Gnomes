@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(LIB_NAME ${PROJECT_NAME}_game)
+set(FMOD_INC /opt/fmodengine/api/core/inc)
+set(FMOD_LIB_DIR /opt/fmodengine/api/core/lib/x86_64)
 
 set(DIR_ASSETS_ORIGIN ${CMAKE_SOURCE_DIR}/assets)
 set(DIR_ASSETS_DESTINATION $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets)
@@ -37,11 +39,24 @@ list(REMOVE_ITEM LIB_EXCLUSIVE ${EXE_EXCLUSIVE} ${SHARED_SOURCES})
 
 # EXEKVERBAR
 add_executable(${PROJECT_NAME} ${EXE_EXCLUSIVE})
+target_link_directories(${PROJECT_NAME} PRIVATE ${FMOD_LIB_DIR})
+target_link_options(${PROJECT_NAME} PRIVATE "LINKER:--no-as-needed")
+target_link_libraries(${PROJECT_NAME} PRIVATE fmod)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        BUILD_RPATH ${FMOD_LIB_DIR}
+        INSTALL_RPATH ${FMOD_LIB_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${FMOD_INC})
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 ${SHARED_LIB_NAME})
 
 # DELAT BIBLIOTEK (.so)
 add_library(${LIB_NAME} SHARED ${LIB_EXCLUSIVE})
+target_include_directories(${LIB_NAME} PRIVATE ${FMOD_INC})
+target_link_directories(${LIB_NAME} PRIVATE ${FMOD_LIB_DIR})
+target_link_libraries(${LIB_NAME} PRIVATE fmod)
+set_target_properties(${LIB_NAME} PROPERTIES
+        BUILD_RPATH ${FMOD_LIB_DIR}
+        INSTALL_RPATH ${FMOD_LIB_DIR})
 target_include_directories(${LIB_NAME} PRIVATE include)
 target_link_libraries(${LIB_NAME} PRIVATE SDL3::SDL3 ${SHARED_LIB_NAME} jsoncpp imgui)
 

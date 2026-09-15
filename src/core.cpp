@@ -73,6 +73,8 @@ void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer) {
 extern "C" {
 void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer) {
     DEV::Initialize(window, renderer);
+    InitializeAudioSystem(&data->audio, data->arena_main);
+    AssetManagement::LoadAllSFX(&data->audio);
     data->sprites.LoadAll(renderer, data->arena_images);
     AssetManagement::LoadAllTilesets(data->tilesetBuffer, data->arena_images);
     data->imGui_context = ImGui::GetCurrentContext();
@@ -100,6 +102,7 @@ bool HandleEvents(Arena* arena, SDL_Event& event) {
 }
 
 void Update(GameData* data, float dt) {
+    UpdateAudio(&data->audio);
     Gameplay* gameplay = &data->scenes.gameplay;
     EditorData* editorData = &data->editor_data;
     Transition* transition = &data->transition;
