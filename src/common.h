@@ -8,7 +8,8 @@
 #define AS_MEGABYTES(b) (AS_KILOBYTES(b) / 1024.0)
 #define AS_GIGABYTES(b) (AS_MEGABYTES(b) / 1024.0)
 
-constexpr size_t GAME_MEMORY_ALLOWANCE = MEGABYTES(10);
+constexpr size_t GAME_MEMORY_ALLOWANCE = MEGABYTES(14);
+constexpr size_t AUDIO_MEMORY_ALLOWANCE = MEGABYTES(5);
 
 constexpr int TARGET_FPS = 60;
 const double FRAME_TIME_MS = 1000.0 / TARGET_FPS;

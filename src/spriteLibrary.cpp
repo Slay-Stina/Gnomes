@@ -18,7 +18,7 @@ namespace {
     const SpriteDataEntry ALL_SPRITE_DATA[] = {
             {SPRITE_ID::Fallback, FALLBACK_PATH, 8, 8},
             {SPRITE_ID::Gnome_Rotate, "assets/sprites/gnome-Sheet.png", 8, 8, 3, 1},
-            {SPRITE_ID::Rock, "assets/sprites/rock.png", 10, 20},
+            {SPRITE_ID::Rock, "assets/sprites/rock.png", 9, 15},
             {SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1},
             {SPRITE_ID::Golem, "assets/sprites/golem.png"},
             {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 8},

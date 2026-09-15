@@ -6,6 +6,7 @@
 #include "command.h"
 #include <imgui.h>
 
+#include "audioSystem.h"
 #include "game.h"
 #include "levelEditor.h"
 #include "mainmenu.h"
@@ -57,6 +58,7 @@ struct GameData {
     bool running;
     const float* dt;
     float* dt_scaler;
+    AudioSystem audio;
     SCENE_TYPES scene_current;
     SCENE_TYPES scene_previous;
     Scenes scenes;
