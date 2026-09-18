@@ -56,7 +56,7 @@ namespace EDITOR {
                      SpriteLibrary& sprites) {
         int x;
         int y;
-        camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level);
+        camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level, camera->camera_z);
         SpriteRenderInfo preview = sprites.Get(editor->object_to_place_id);
         if (preview.sprite == nullptr || !editor->has_selection) {
             return;
@@ -64,22 +64,23 @@ namespace EDITOR {
         RenderSprite_OnTile(preview, level, renderer, camera, x, y, 1, 0.5);
     }
 
-    void Update(Editor* editor, Input* input, LevelData* level, CommandBuffer* buffer) {
+    void Update(Editor* editor, Input* input, LevelData* level, CommandBuffer* buffer, Camera* camera) {
+        float zoom = camera->camera_z;
         if (ImGui::GetIO().WantCaptureMouse) {
             return;
         }
         if (MousePressed(input, MouseButtons::LEFT)) {
-            if (camera::GetIsPointInsideGrid(input->mouse_x, input->mouse_y, level)) {
+            if (camera::GetIsPointInsideGrid(input->mouse_x, input->mouse_y, level, zoom)) {
                 int x;
                 int y;
-                camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level);
+                camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level, zoom);
                 PlaceObject(x, y, editor, level, buffer);
             }
         } else if (MousePressed(input, MouseButtons::RIGHT)) {
-            if (camera::GetIsPointInsideGrid(input->mouse_x, input->mouse_y, level)) {
+            if (camera::GetIsPointInsideGrid(input->mouse_x, input->mouse_y, level, zoom)) {
                 int x;
                 int y;
-                camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level);
+                camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level, zoom);
                 Entity* entity = GetEntity(level, x, y);
                 if (entity == nullptr) {
                     return;

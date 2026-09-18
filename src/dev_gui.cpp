@@ -98,6 +98,9 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer) {
             if (ImGui::BeginTabItem("perf")) {
                 DrawFPS(data);
                 ImGui::SliderFloat("deltaTimeScaler", data->dt_scaler, 0.1, 3);
+                ImGui::SliderFloat("camera-x", &data->camera.camera_x, -1000, 1000);
+                ImGui::SliderFloat("camera-y", &data->camera.camera_y, -1000, 1000);
+                ImGui::SliderFloat("camera-z", &data->camera.camera_z, 0.1, 3);
                 Draw_History(gameplay->commandBuffer, GetCurrentLevel(gameplay));
                 ImGui::EndTabItem();
             }
