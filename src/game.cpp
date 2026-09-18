@@ -198,7 +198,7 @@ void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena*
         }
     }
 
-
+    gameplay->commandBuffer->timestamp += 1;
     if (are_entities_acting) {
         return;
     }
@@ -219,7 +219,6 @@ void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena*
         if (moved) {
             PlaySFX(SFX_ID::JUMP);
         }
-        gameplay->commandBuffer->timestamp += 1;
         gameplay->input_buffer_read_count++;
     }
 }

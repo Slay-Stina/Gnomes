@@ -52,7 +52,7 @@ void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer) {
     switch (scene) {
         case SCENE_TYPES::TITLESCREEN: {
             Sprite* background = data->sprites.GetBySpriteID(SPRITE_ID::titlescreen_background);
-            Camera screen_camera = {0, 0};
+            Camera screen_camera = {0, 0, 1};
             RenderSprite_World(background, renderer, &screen_camera, 0, 0);
             break;
         }
@@ -72,6 +72,7 @@ void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer) {
 
 extern "C" {
 void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer) {
+    data->camera.camera_z = 1.0f;
     DEV::Initialize(window, renderer);
     InitializeAudioSystem(&data->audio, data->arena_main);
     AssetManagement::LoadAllSFX(&data->audio);
@@ -112,7 +113,8 @@ void Update(GameData* data, float dt) {
         editorData->edit_level = !editorData->edit_level;
     }
     if (editorData->edit_level) {
-        EDITOR::Update(&editorData->editor, &data->input, GetCurrentLevel(gameplay), gameplay->commandBuffer);
+        EDITOR::Update(&editorData->editor, &data->input, GetCurrentLevel(gameplay), gameplay->commandBuffer,
+                       &data->camera);
     }
 
     // Dev
@@ -164,7 +166,7 @@ void Draw(GameData* data, SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 143, 86, 59, 255);
     SDL_RenderClear(renderer);
 
-    Camera screen_camera = {0, 0}; // ingen kamera-offset för overlayet
+    Camera screen_camera = {0, 0, 1}; // ingen kamera-offset för overlayet
     switch (data->transition.state) {
         case Transition::Inactive:
             DrawScene(data, data->scene_current, renderer);

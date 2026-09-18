@@ -14,15 +14,16 @@ void RenderButton(Button* button, bool is_selected, SDL_Renderer* renderer) {
 
 void RenderTile(Sprite* tileset, int cell_id, LevelData* level, SDL_Renderer* renderer,
                 const Camera* camera, float x, float y, float scale, float alpha) {
-    camera::GridToWorld(&x, &y, level);
+    camera::GridToWorld(&x, &y, level, camera->camera_z);
     RenderSprite_World({cell_id, tileset}, renderer, camera, x, y, scale, alpha, false);
 }
 
 void RenderSprite_OnTile(SpriteRenderInfo spriteInfo, LevelData* lvl, SDL_Renderer* renderer,
                          const Camera* camera, float x, float y, float scale, float alpha, bool flipped) {
-    camera::GridToWorld(&x, &y, lvl);
-    x += TILE_SIZE_PX_SCALED / 2.0;
-    y += TILE_SIZE_PX_SCALED / 2.0;
+    float zoom = camera->camera_z;
+    camera::GridToWorld(&x, &y, lvl, zoom);
+    x += TILE_SIZE_PX_SCALED * zoom / 2.0f;
+    y += TILE_SIZE_PX_SCALED * zoom / 2.0f;
     RenderSprite_World(spriteInfo, renderer, camera, x, y, scale, alpha, flipped);
 }
 
@@ -49,7 +50,8 @@ void RenderSprite_World(SpriteRenderInfo spriteRenderInfo, SDL_Renderer* rendere
     SDL_FRect rect;
     rect.x = x;
     rect.y = y;
-    float final_scale = UPSCALE_FACTOR * scale;
+    float zoom = (camera != nullptr) ? camera->camera_z : 1.0f;
+    float final_scale = UPSCALE_FACTOR * scale * zoom;
     rect.h = tilesetRect.h * final_scale;
     rect.w = tilesetRect.w * final_scale;
     rect.x -= sprite->pivot_x * final_scale;
