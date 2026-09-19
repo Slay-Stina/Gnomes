@@ -41,7 +41,7 @@ bool IsEntityBelowOtherEntity(Entity* a, Entity* b) {
 void RenderEntities(GameData* data, SDL_Renderer* renderer) {
     Gameplay* gameplay = &data->scenes.gameplay;
     LevelData* lvl = GetCurrentLevel(gameplay);
-    Entity** sortedEntities = ALLOC_ARRAY(data->arena_scratch, Entity*, lvl->entityCount);
+    Entity** sortedEntities = ALLOC_ARRAY(data->arena_scratch, Entity *, lvl->entityCount);
 
     for (int i = 0; i < lvl->entityCount; i++) {
         sortedEntities[i] = &lvl->entityBuffer[i];
@@ -54,7 +54,7 @@ void RenderEntities(GameData* data, SDL_Renderer* renderer) {
         if (!entity->active) {
             continue;
         }
-        SpriteRenderInfo sprite = data->sprites.GetSprite_FromEntityState(entity);
+        SpriteRenderInfo sprite = data->sprites.GetSprite_FromEntityState(entity, data->ticks_total);
         float x_animated = std::lerp(entity->x_prev, entity->x, entity->progress_01);
         float y_animated = std::lerp(entity->y_prev, entity->y, entity->progress_01);
         float ground_y = y_animated;

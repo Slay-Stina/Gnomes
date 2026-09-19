@@ -142,6 +142,7 @@ int main() {
     Initialize(arena_main, game_memory, GAME_MEMORY_ALLOWANCE);
     GameData* gameData = ALLOC(arena_main, GameData);
     gameData->arena_main = arena_main;
+    gameData->ticks_total = ALLOC(arena_main, uint64_t);
     gameData->arena_scratch = CreateSubArena(arena_main, KILOBYTES(256));
 
     Gameplay* gameplay = &gameData->scenes.gameplay;
