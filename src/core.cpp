@@ -75,7 +75,7 @@ void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer) {
     *data->ticks_total = 0;
     data->camera.camera_z = 1.0f;
     DEV::Initialize(window, renderer);
-    InitializeAudioSystem(&data->audio, data->arena_main);
+    Audio::Initialize(&data->audio, data->arena_main);
     AssetManagement::LoadAllSFX(&data->audio);
     data->sprites.LoadAll(renderer, data->arena_images);
     AssetManagement::LoadAllTilesets(data->tilesetBuffer, data->arena_images);
@@ -84,6 +84,7 @@ void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer) {
     SDL_SetTextureBlendMode(blackfade, SDL_BLENDMODE_BLEND);
     Game::Initialize(&data->scenes.gameplay, data->arena_levels, data->tilesetBuffer);
     Menu::Initialize(&data->scenes.mainMenu, &data->sprites, data->arena_main);
+    PlaySong(SONG_ID::THEME);
     ChangeScene(data, SCENE_TYPES::MAINMENU);
 }
 
@@ -105,7 +106,7 @@ bool HandleEvents(Arena* arena, SDL_Event& event) {
 
 void Update(GameData* data, float dt) {
     *data->ticks_total += 1;
-    UpdateAudio(&data->audio);
+    Audio::Update(&data->audio);
     Gameplay* gameplay = &data->scenes.gameplay;
     EditorData* editorData = &data->editor_data;
     Transition* transition = &data->transition;
