@@ -1,5 +1,7 @@
 #pragma once
 
+struct Input;
+
 namespace Memory {
     struct Arena;
 }
@@ -7,6 +9,7 @@ namespace Memory {
 struct GameData;
 struct SDL_Renderer;
 struct Button;
+struct Sprite;
 class SpriteLibrary;
 
 struct MainMenu {
@@ -16,6 +19,11 @@ struct MainMenu {
     Button** activeButtons;
     int activeButtonCount;
     bool initialized;
+    Sprite* background_horizon;
+    Sprite* background_cloud_back;
+    Sprite* background_cloud_front;
+    Sprite* background_middle;
+    Sprite* background_front;
 };
 
 namespace Menu {
@@ -23,5 +31,5 @@ namespace Menu {
 
     void Update(GameData* data);
 
-    void Draw(MainMenu* mainmenu, SDL_Renderer* renderer, SpriteLibrary* sprites);
+    void Draw(MainMenu* mainmenu, SDL_Renderer* renderer, SpriteLibrary* sprites, Input* input);
 }

@@ -71,6 +71,11 @@ enum class SPRITE_ID {
     dungeon_tileset,
     selection_marker,
     Goal,
+    Menu_Horizon,
+    Menu_Cloud_Back,
+    Menu_Cloud_Front,
+    Menu_Middle,
+    Menu_Front,
     COUNT // COUNT = antal, sista värdet
 };
 

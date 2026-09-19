@@ -57,7 +57,7 @@ void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer) {
             break;
         }
         case SCENE_TYPES::MAINMENU:
-            Menu::Draw(&data->scenes.mainMenu, renderer, &data->sprites);
+            Menu::Draw(&data->scenes.mainMenu, renderer, &data->sprites, &data->input);
             break;
         case SCENE_TYPES::GAME:
             Game::Draw(data, renderer);
