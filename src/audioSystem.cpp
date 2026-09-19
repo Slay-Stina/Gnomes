@@ -13,7 +13,7 @@ static const SoundDataEntry all_sound_data[] = {
         {SFX_ID::JUMP, "assets/audio/sfx/fallback.wav"},
 };
 
-void InitializeAudioSystem(AudioSystem* audio, Memory::Arena* arena_main) {
+void Audio::Initialize(AudioSystem* audio, Memory::Arena* arena_main) {
     assert(audio->initialized == false);
     audio->fmod_memory = Memory::Allocate(arena_main, AUDIO_MEMORY_ALLOWANCE);
 
@@ -67,7 +67,28 @@ void PlaySFX(SFX_ID id, float volume) {
     FMOD_Channel_SetVolume(*channel_slot, volume);
 }
 
-void UpdateAudio(AudioSystem* audio) {
+void PlaySong(SONG_ID id) {
+    g_audioSystem->song_id = id;
+    if (g_audioSystem->song != nullptr) {
+        FMOD_Channel_Stop(g_audioSystem->song_channel);
+        FMOD_Sound_Release(g_audioSystem->song);
+    }
+    FMOD_SYSTEM* system = g_audioSystem->sound_system;
+    const char* song_name;
+    switch (id) {
+        case SONG_ID::THEME:
+            song_name = "assets/audio/music/hellofatime.mp3";
+            break;
+        case SONG_ID::NONE:
+            break;
+    }
+    FMOD_System_CreateStream(system, song_name, FMOD_LOOP_NORMAL, nullptr, &g_audioSystem->song);
+    int FOREVER = -1;
+    FMOD_Sound_SetLoopCount(g_audioSystem->song, FOREVER);
+    FMOD_System_PlaySound(system, g_audioSystem->song, nullptr, false, &g_audioSystem->song_channel);
+}
+
+void Audio::Update(AudioSystem* audio) {
     if (g_audioSystem == nullptr || g_audioSystem != audio) {
         g_audioSystem = audio;
     }
