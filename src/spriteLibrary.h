@@ -13,6 +13,7 @@ struct Sprite {
     int pivot_y;
     int sprite_count_x;
     int sprite_count_y;
+    int framerate;
 };
 
 inline int GetSpriteCount(Sprite* sprite) {
@@ -55,9 +56,22 @@ struct SpriteRenderInfo {
 
 
 enum class SPRITE_ID {
-    Fallback, Rock, Gnome_Rotate, Medusa_Rotate, Golem, Siren,
-    Dropshadow, titlescreen_background, black_1x1,
-    dungeon_tileset, selection_marker, Goal, COUNT // COUNT = antal, sista värdet
+    Fallback,
+    Rock,
+    Gnome_Rotate,
+    Medusa_Rotate,
+    Medusa_Idle_Left,
+    Medusa_Idle_Front,
+    Medusa_Idle_Back,
+    Golem,
+    Siren,
+    Dropshadow,
+    titlescreen_background,
+    black_1x1,
+    dungeon_tileset,
+    selection_marker,
+    Goal,
+    COUNT // COUNT = antal, sista värdet
 };
 
 class SpriteLibrary {
@@ -66,7 +80,7 @@ public:
 
     SpriteRenderInfo Get(ENTITY_ID id) const;
 
-    SpriteRenderInfo GetSprite_FromEntityState(const Entity* entity) const;
+    SpriteRenderInfo GetSprite_FromEntityState(const Entity* entity, const uint64_t* ticks_total) const;
 
     Sprite* GetBySpriteID(SPRITE_ID id) const;
 

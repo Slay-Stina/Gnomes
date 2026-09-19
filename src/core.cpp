@@ -72,6 +72,7 @@ void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer) {
 
 extern "C" {
 void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer) {
+    *data->ticks_total = 0;
     data->camera.camera_z = 1.0f;
     DEV::Initialize(window, renderer);
     InitializeAudioSystem(&data->audio, data->arena_main);
@@ -103,6 +104,7 @@ bool HandleEvents(Arena* arena, SDL_Event& event) {
 }
 
 void Update(GameData* data, float dt) {
+    *data->ticks_total += 1;
     UpdateAudio(&data->audio);
     Gameplay* gameplay = &data->scenes.gameplay;
     EditorData* editorData = &data->editor_data;

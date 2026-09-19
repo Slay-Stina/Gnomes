@@ -3,6 +3,8 @@
 #include <cassert>
 #include <cmath>
 
+#include "common.h"
+
 namespace {
     const char* FALLBACK_PATH = "assets/sprites/fallback.png";
 
@@ -13,14 +15,18 @@ namespace {
         int pivot_y = NOT_SET;
         int sprite_count_x = NOT_SET;
         int sprite_count_y = NOT_SET;
+        int framerate = NOT_SET;
     };
 
     const SpriteDataEntry ALL_SPRITE_DATA[] = {
             {SPRITE_ID::Fallback, FALLBACK_PATH, 8, 8},
-            {SPRITE_ID::Gnome_Rotate, "assets/sprites/gnome-Sheet.png", 8, 8, 3, 1},
+            {SPRITE_ID::Gnome_Rotate, "assets/sprites/gnome-Sheet.png", 8, 16, 3, 1},
             {SPRITE_ID::Rock, "assets/sprites/rock.png", 9, 15},
-            {SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1},
-            {SPRITE_ID::Golem, "assets/sprites/golem.png"},
+            {SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1, 8},
+            {SPRITE_ID::Medusa_Idle_Left, "assets/sprites/medusa_idle_left.png", 12, 24, 4, 1, 8},
+            {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24, 4, 1, 8},
+            {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24, 4, 1, 8},
+            {SPRITE_ID::Golem, "assets/sprites/golem.png", 8, 16},
             {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 8},
             {SPRITE_ID::black_1x1, "assets/sprites/1x1_black.png", 0, 0},
             {SPRITE_ID::titlescreen_background, "assets/sprites/titlescreen.png", 325, 200},
@@ -39,6 +45,7 @@ namespace {
         sprite->height = sprite->texture->h;
         sprite->sprite_count_x = entry.sprite_count_x;
         sprite->sprite_count_y = entry.sprite_count_y;
+        sprite->framerate = entry.framerate;
         if (entry.pivot_x == NOT_SET || entry.pivot_y == NOT_SET) {
             sprite->pivot_x = sprite->width / 2;
             sprite->pivot_y = sprite->height / 2;
@@ -78,7 +85,7 @@ SpriteRenderInfo SpriteLibrary::Get(ENTITY_ID id) const {
     return GetBySpriteID(spriteId);
 }
 
-SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState(const Entity* entity) const {
+SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState(const Entity* entity, const uint64_t* ticks_total) const {
     if (HasBehaviour(entity, IS_PETRIFIED)) {
         return GetBySpriteID(SPRITE_ID::Rock);
     }
@@ -123,16 +130,25 @@ SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState(const Entity* entity) 
     }
     switch (entity->id) {
         case ENTITY_ID::MEDUSA: {
-            Sprite* sprite = GetBySpriteID(SPRITE_ID::Medusa_Rotate);
+            Sprite* sprite = nullptr;
+            int frame = 0;
             switch (entity->facing_current) {
                 case Direction::RIGHT:
-                    return {6, sprite};
+                    sprite = GetBySpriteID(SPRITE_ID::Medusa_Idle_Left);
+                    frame = (int) (*ticks_total * sprite->framerate / TARGET_FPS % GetSpriteCount(sprite));
+                    return {frame, sprite, true};
                 case Direction::LEFT:
-                    return {2, sprite};
-                case Direction::DOWN:
-                    return {4, sprite};
+                    sprite = GetBySpriteID(SPRITE_ID::Medusa_Idle_Left);
+                    frame = (int) (*ticks_total * sprite->framerate / TARGET_FPS % GetSpriteCount(sprite));
+                    return {frame, sprite};
                 case Direction::UP:
-                    return {0, sprite};
+                    sprite = GetBySpriteID(SPRITE_ID::Medusa_Idle_Back);
+                    frame = (int) (*ticks_total * sprite->framerate / TARGET_FPS % GetSpriteCount(sprite));
+                    return {frame, sprite};
+                case Direction::DOWN:
+                    sprite = GetBySpriteID(SPRITE_ID::Medusa_Idle_Front);
+                    frame = (int) (*ticks_total * sprite->framerate / TARGET_FPS % GetSpriteCount(sprite));
+                    return {frame, sprite};
             }
             return GetBySpriteID(SPRITE_ID::Fallback);
         }
@@ -142,7 +158,7 @@ SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState(const Entity* entity) 
                 case Direction::RIGHT:
                     return {1, sprite, true};
                 case Direction::LEFT:
-                    return {1, sprite, false};
+                    return {1, sprite};
                 case Direction::DOWN:
                     return {0, sprite};
                 case Direction::UP:
@@ -150,11 +166,14 @@ SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState(const Entity* entity) 
             }
             return GetBySpriteID(SPRITE_ID::Fallback);
         }
+        case ENTITY_ID::GOLEM:
+            return GetBySpriteID(SPRITE_ID::Golem);
         case ENTITY_ID::ROCK:
             return GetBySpriteID(SPRITE_ID::Rock);
         default:
             return GetBySpriteID(SPRITE_ID::Fallback);
     }
+    return GetBySpriteID(SPRITE_ID::Fallback);
 }
 
 Sprite* SpriteLibrary::GetBySpriteID(SPRITE_ID id) const {

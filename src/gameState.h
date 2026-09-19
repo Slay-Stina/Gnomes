@@ -58,6 +58,7 @@ struct GameData {
     bool running;
     const float* dt;
     float* dt_scaler;
+    uint64_t* ticks_total;
     AudioSystem audio;
     SCENE_TYPES scene_current;
     SCENE_TYPES scene_previous;
