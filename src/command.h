@@ -25,7 +25,7 @@ struct MoveCommand : Command {
     int xDir;
     int yDir;
 
-    MoveCommand(Entity* _entity, int _xDir, int _yDir) {
+    MoveCommand( Entity* _entity, int _xDir, int _yDir ) {
         entity = _entity;
         xDir = _xDir;
         yDir = _yDir;
@@ -38,7 +38,7 @@ struct RotateCommand : Command {
     Direction from;
     Direction to;
 
-    RotateCommand(Entity* _entity, Direction _from, Direction _to) {
+    RotateCommand( Entity* _entity, Direction _from, Direction _to ) {
         entity = _entity;
         from = _from;
         to = _to;
@@ -56,7 +56,7 @@ struct ModifyBehaviourCommand : Command {
     Behaviour flag;
     Mode mode;
 
-    ModifyBehaviourCommand(Entity* _entity, Behaviour _flag, Mode _mode) {
+    ModifyBehaviourCommand( Entity* _entity, Behaviour _flag, Mode _mode ) {
         entity = _entity;
         flag = _flag;
         mode = _mode;
@@ -69,7 +69,7 @@ struct AddCommand : Command {
     int y;
     ENTITY_ID id;
 
-    AddCommand(int _x, int _y, ENTITY_ID _id) {
+    AddCommand( int _x, int _y, ENTITY_ID _id ) {
         x = _x;
         y = _y;
         id = _id;
@@ -83,7 +83,7 @@ struct RemoveCommand : Command {
     Behaviour storedBehaviour;
     ENTITY_ID storedID;
 
-    RemoveCommand(Entity* entity) {
+    RemoveCommand( Entity* entity ) {
         x = entity->x;
         y = entity->y;
         storedBehaviour = entity->behaviour;
@@ -97,7 +97,7 @@ struct SwapActiveEntityCommand : Command {
     int index_previous;
     int* value_to_change;
 
-    SwapActiveEntityCommand(int* activeEntityIndex, int limit) {
+    SwapActiveEntityCommand( int* activeEntityIndex, int limit ) {
         index_previous = *activeEntityIndex;
         index_current = *activeEntityIndex + 1;
         value_to_change = activeEntityIndex;
@@ -115,27 +115,27 @@ union AnyCommand {
     RemoveCommand remove;
     SwapActiveEntityCommand swap_active;
 
-    AnyCommand(MoveCommand mov) {
+    AnyCommand( MoveCommand mov ) {
         move = mov;
     }
 
-    AnyCommand(RotateCommand rot) {
+    AnyCommand( RotateCommand rot ) {
         rotate = rot;
     }
 
-    AnyCommand(ModifyBehaviourCommand mod) {
+    AnyCommand( ModifyBehaviourCommand mod ) {
         modify = mod;
     }
 
-    AnyCommand(AddCommand _add) {
+    AnyCommand( AddCommand _add ) {
         add = _add;
     }
 
-    AnyCommand(RemoveCommand rem) {
+    AnyCommand( RemoveCommand rem ) {
         remove = rem;
     }
 
-    AnyCommand(SwapActiveEntityCommand swp) {
+    AnyCommand( SwapActiveEntityCommand swp ) {
         swap_active = swp;
     }
 };
@@ -148,10 +148,10 @@ struct CommandBuffer {
     int head;
 };
 
-void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* level);
+void Push( CommandBuffer* buffer, AnyCommand cmd, LevelData* level );
 
-void Undo(CommandBuffer* buffer, LevelData* level);
+void Undo( CommandBuffer* buffer, LevelData* level );
 
-void Redo(CommandBuffer* buffer, LevelData* level);
+void Redo( CommandBuffer* buffer, LevelData* level );
 
-void ResetCommandBuffer(CommandBuffer* buffer);
+void ResetCommandBuffer( CommandBuffer* buffer );

@@ -14,17 +14,17 @@ using namespace std;
 const int LEVEL_INDEX = 0;
 const int ENTITIES_INDEX = 1;
 
-uint16_t GetCellID(LevelData* level, int x, int y) {
-    assert(! (x < 0 || x >= level->w || y < 0 || y >= level->h));
+uint16_t GetCellID( LevelData* level, int x, int y ) {
+    assert(!(x < 0 || x >= level->w || y < 0 || y >= level->h));
     return level->cells[y * level->w + x];
 }
 
-bool IsWalkable(int x, int y, LevelData* level) {
+bool IsWalkable( int x, int y, LevelData* level ) {
     uint16_t id = GetCellID(level, x, y);
     return level->tileset->walkableBuffer[id];
 }
 
-Entity* GetEntity(LevelData* level, int x, int y) {
+Entity* GetEntity( LevelData* level, int x, int y ) {
     for (int i = 0; i < level->entityCount; i++) {
         if (level->entityBuffer[i].active && level->entityBuffer[i].x == x && level->entityBuffer[i].y == y) {
             return &level->entityBuffer[i];
@@ -33,7 +33,7 @@ Entity* GetEntity(LevelData* level, int x, int y) {
     return nullptr;
 }
 
-void CreateLevel(Arena* arena, LevelData* level, const Tileset* tileset, const char* level_name) {
+void CreateLevel( Arena* arena, LevelData* level, const Tileset* tileset, const char* level_name ) {
     ifstream stream(level_name);
     Json::CharReaderBuilder reader;
     Json::Value result;
@@ -61,7 +61,7 @@ void CreateLevel(Arena* arena, LevelData* level, const Tileset* tileset, const c
         }
         level->cells[i] = local_id;
     }
-    
+
     level->goals = nullptr;
     level->goalCount = 0;
     bool foundGoals = false;
@@ -96,7 +96,7 @@ void CreateLevel(Arena* arena, LevelData* level, const Tileset* tileset, const c
     }
 }
 
-void CreateEntities(LevelData* lvl_data, Arena* arena) {
+void CreateEntities( LevelData* lvl_data, Arena* arena ) {
     Reset(arena);
     lvl_data->entityCount = 0;
     lvl_data->entityBuffer = ALLOC_ARRAY(arena, Entity, MAX_NUM_ENTITIES);
@@ -125,7 +125,7 @@ void CreateEntities(LevelData* lvl_data, Arena* arena) {
     }
 }
 
-Entity* GetNextAvailableEntity(LevelData* level) {
+Entity* GetNextAvailableEntity( LevelData* level ) {
     for (int i = 0; i < level->entityCount; i++) {
         if (!level->entityBuffer[i].active) {
             return &level->entityBuffer[i];
@@ -137,7 +137,7 @@ Entity* GetNextAvailableEntity(LevelData* level) {
     return &level->entityBuffer[level->entityCount++];
 }
 
-void AddEntity(ENTITY_ID entity_id, int x, int y, LevelData* level) {
+void AddEntity( ENTITY_ID entity_id, int x, int y, LevelData* level ) {
     Entity* entity = GetEntity(level, x, y);
     if (entity == nullptr) {
         entity = GetNextAvailableEntity(level);
@@ -155,7 +155,7 @@ void AddEntity(ENTITY_ID entity_id, int x, int y, LevelData* level) {
     InitializeBaseBehaviour(entity);
 }
 
-void RemoveEntity(int x, int y, LevelData* level) {
+void RemoveEntity( int x, int y, LevelData* level ) {
     Entity* entity = GetEntity(level, x, y);
     if (entity == nullptr) {
         return;
@@ -163,7 +163,7 @@ void RemoveEntity(int x, int y, LevelData* level) {
     entity->active = false;
 }
 
-Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, LevelData* level, bool ignore_walls) {
+Entity* RaycastFirstEntity( int x_origin, int y_origin, Direction direction, LevelData* level, bool ignore_walls ) {
     Position facingVector{};
     switch (direction) {
         case Direction::RIGHT:
@@ -197,7 +197,7 @@ Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, Leve
 
 namespace AssetManagement {
     std::vector<uint16_t>
-    GetCellDataFromJsonLayer(const Json::Value& parsedJson, const char* layerName, bool* wasFound) {
+    GetCellDataFromJsonLayer( const Json::Value& parsedJson, const char* layerName, bool* wasFound ) {
         std::vector<uint16_t> result;
         *wasFound = false;
         for (const Json::Value& layer: parsedJson["layers"]) {
@@ -212,7 +212,7 @@ namespace AssetManagement {
         return result;
     }
 
-    int GetFirstNonZeroCell(std::vector<uint16_t>* list) {
+    int GetFirstNonZeroCell( std::vector<uint16_t>* list ) {
         for (uint16_t id: *list) {
             if (id != 0) {
                 return id;

@@ -9,11 +9,11 @@
 AudioSystem* g_audioSystem;
 
 static const SoundDataEntry all_sound_data[] = {
-        {SFX_ID::FALLBACK, "assets/audio/sfx/fallback.wav"},
-        {SFX_ID::JUMP, "assets/audio/sfx/fallback.wav"},
+    {SFX_ID::FALLBACK, "assets/audio/sfx/fallback.wav"},
+    {SFX_ID::JUMP, "assets/audio/sfx/fallback.wav"},
 };
 
-void Audio::Initialize(AudioSystem* audio, Memory::Arena* arena_main) {
+void Audio::Initialize( AudioSystem* audio, Memory::Arena* arena_main ) {
     assert(audio->initialized == false);
     audio->fmod_memory = Memory::Allocate(arena_main, AUDIO_MEMORY_ALLOWANCE);
 
@@ -35,7 +35,7 @@ void Audio::Initialize(AudioSystem* audio, Memory::Arena* arena_main) {
 
 const int NOT_FOUND = -1;
 
-static int GetAvailableChannelIndex(AudioSystem* audio) {
+static int GetAvailableChannelIndex( AudioSystem* audio ) {
     for (int i = 0; i < AudioSystem::CHANNEL_COUNT; i++) {
         FMOD_CHANNEL* channel = audio->channels[i];
         if (channel == nullptr) {
@@ -50,7 +50,7 @@ static int GetAvailableChannelIndex(AudioSystem* audio) {
     return NOT_FOUND;
 }
 
-void PlaySFX(SFX_ID id, float volume) {
+void PlaySFX( SFX_ID id, float volume ) {
     assert(id != SFX_ID::COUNT);
     FMOD_SOUND* sfx = g_audioSystem->soundEffects[(int) id];
     if (sfx == nullptr) {
@@ -67,7 +67,7 @@ void PlaySFX(SFX_ID id, float volume) {
     FMOD_Channel_SetVolume(*channel_slot, volume);
 }
 
-void PlaySong(SONG_ID id) {
+void PlaySong( SONG_ID id ) {
     g_audioSystem->song_id = id;
     if (g_audioSystem->song != nullptr) {
         FMOD_Channel_Stop(g_audioSystem->song_channel);
@@ -88,7 +88,7 @@ void PlaySong(SONG_ID id) {
     FMOD_System_PlaySound(system, g_audioSystem->song, nullptr, false, &g_audioSystem->song_channel);
 }
 
-void Audio::Update(AudioSystem* audio) {
+void Audio::Update( AudioSystem* audio ) {
     if (g_audioSystem == nullptr || g_audioSystem != audio) {
         g_audioSystem = audio;
     }
@@ -96,11 +96,11 @@ void Audio::Update(AudioSystem* audio) {
     FMOD_System_Update(audio->sound_system);
 }
 
-void AssetManagement::LoadAllSFX(AudioSystem* audioSystem) {
+void AssetManagement::LoadAllSFX( AudioSystem* audioSystem ) {
     for (const SoundDataEntry& sound_data: all_sound_data) {
         FMOD_RESULT sound_created_ok = FMOD_System_CreateSound(
-                audioSystem->sound_system, sound_data.path, FMOD_DEFAULT, nullptr,
-                &audioSystem->soundEffects[(int) sound_data.id]);
+            audioSystem->sound_system, sound_data.path, FMOD_DEFAULT, nullptr,
+            &audioSystem->soundEffects[(int) sound_data.id]);
         assert(sound_created_ok == FMOD_OK);
     }
 }

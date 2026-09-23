@@ -24,15 +24,15 @@ constexpr const char* NAME_OF_LIB = "./libGnomes_game.so";
 constexpr const char* NAME_OF_TEMP_LIB = "./libGnomes_game_temp.so";
 static int load_counter = 0;
 
-typedef void (*Function_Initialize)(GameData* data, SDL_Window* window, SDL_Renderer* renderer);
+typedef void ( *Function_Initialize )( GameData* data, SDL_Window* window, SDL_Renderer* renderer );
 
-typedef bool (*Function_HandleEvents)(Arena* arena, SDL_Event event);
+typedef bool ( *Function_HandleEvents )( Arena* arena, SDL_Event event );
 
-typedef void (*Function_Update)(GameData* data, float dt);
+typedef void ( *Function_Update )( GameData* data, float dt );
 
-typedef void (*Function_Draw)(GameData* data, SDL_Renderer* renderer);
+typedef void ( *Function_Draw )( GameData* data, SDL_Renderer* renderer );
 
-typedef void (*Function_OnQuit)(SDL_Renderer* renderer);
+typedef void ( *Function_OnQuit )( SDL_Renderer* renderer );
 
 struct DLL_INFO {
     void* handle;
@@ -52,7 +52,7 @@ time_t GetTimestamp() {
     return 0;
 }
 
-bool LoadDLL(DLL_INFO* info, int depth = 0) {
+bool LoadDLL( DLL_INFO* info, int depth = 0 ) {
     if (depth > 20) {
         SDL_Log("failed to write temp library.");
         return false;
@@ -87,12 +87,12 @@ bool LoadDLL(DLL_INFO* info, int depth = 0) {
     return true;
 }
 
-void UnloadDLL(DLL_INFO* info) {
+void UnloadDLL( DLL_INFO* info ) {
     dlclose(info->handle);
     info->handle = nullptr;
 }
 
-void DLL_CheckStatus(DLL_INFO* dll) {
+void DLL_CheckStatus( DLL_INFO* dll ) {
     time_t timestamp = GetTimestamp();
     bool is_timestamp_changed = dll->Timestamp != timestamp;
     if (is_timestamp_changed) {
@@ -102,7 +102,7 @@ void DLL_CheckStatus(DLL_INFO* dll) {
     }
 }
 
-void* AllocateGameMemory(size_t size) {
+void* AllocateGameMemory( size_t size ) {
     void* blob = malloc(size);
     if (blob == nullptr) {
         SDL_Log("fatal error: could not allocate memory");
@@ -117,7 +117,7 @@ void SDL_Setup() {
     renderer = SDL_CreateRenderer(window, nullptr);
 }
 
-void CalculateDeltaTime(float* dt, float scaler) {
+void CalculateDeltaTime( float* dt, float scaler ) {
     NOW = SDL_GetTicksNS();
     *dt = NOW - PREV;
     *dt = SDL_NS_TO_SECONDS(*dt);
@@ -125,7 +125,7 @@ void CalculateDeltaTime(float* dt, float scaler) {
     PREV = NOW;
 }
 
-void CalculateRemainingFrameTime_MS(double* milliseconds) {
+void CalculateRemainingFrameTime_MS( double* milliseconds ) {
     Uint64 frame_end_time_ns = SDL_GetTicksNS();
     double frame_time_spent_ns = frame_end_time_ns - PREV;
     double frame_time_spent_ms = frame_time_spent_ns / 1e6;

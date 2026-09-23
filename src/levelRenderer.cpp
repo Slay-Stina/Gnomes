@@ -5,7 +5,7 @@
 
 #include "rendering.h"
 
-void RenderLevel(GameData* gameData, SDL_Renderer* renderer) {
+void RenderLevel( GameData* gameData, SDL_Renderer* renderer ) {
     Gameplay* gameplay = &gameData->scenes.gameplay;
     LevelData* level = GetCurrentLevel(gameplay);
 
@@ -34,11 +34,11 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer) {
     }
 }
 
-bool IsEntityBelowOtherEntity(Entity* a, Entity* b) {
+bool IsEntityBelowOtherEntity( Entity* a, Entity* b ) {
     return a->y < b->y;
 }
 
-void RenderEntities(GameData* data, SDL_Renderer* renderer) {
+void RenderEntities( GameData* data, SDL_Renderer* renderer ) {
     Gameplay* gameplay = &data->scenes.gameplay;
     LevelData* lvl = GetCurrentLevel(gameplay);
     Entity** sortedEntities = ALLOC_ARRAY(data->arena_scratch, Entity *, lvl->entityCount);

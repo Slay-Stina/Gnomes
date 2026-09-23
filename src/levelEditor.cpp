@@ -7,7 +7,7 @@
 #include "rendering.h"
 
 namespace {
-    bool SpriteButton(const char* id, SpriteRenderInfo info, ImVec2 size) {
+    bool SpriteButton( const char* id, SpriteRenderInfo info, ImVec2 size ) {
         Sprite* sprite = info.sprite;
         int count_x = sprite->sprite_count_x == NOT_SET ? 1 : sprite->sprite_count_x;
         int count_y = sprite->sprite_count_y == NOT_SET ? 1 : sprite->sprite_count_y;
@@ -19,7 +19,7 @@ namespace {
 }
 
 namespace EDITOR {
-    void DrawObjectPanel(Editor* editor, SpriteLibrary& sprites) {
+    void DrawObjectPanel( Editor* editor, SpriteLibrary& sprites ) {
         ImGui::Begin("objects");
         ImVec2 size = {32, 32};
         if (SpriteButton("Rock", sprites.Get(ENTITY_ID::ROCK), size)) {
@@ -44,7 +44,7 @@ namespace EDITOR {
         ImGui::End();
     }
 
-    void PlaceObject(const int x, const int y, Editor* editor, LevelData* level, CommandBuffer* buffer) {
+    void PlaceObject( const int x, const int y, Editor* editor, LevelData* level, CommandBuffer* buffer ) {
         if (!editor->has_selection) {
             return;
         }
@@ -52,8 +52,8 @@ namespace EDITOR {
         Push(buffer, add, level);
     }
 
-    void DrawPreview(Editor* editor, Input* input, SDL_Renderer* renderer, LevelData* level, Camera* camera,
-                     SpriteLibrary& sprites) {
+    void DrawPreview( Editor* editor, Input* input, SDL_Renderer* renderer, LevelData* level, Camera* camera,
+                      SpriteLibrary& sprites ) {
         int x;
         int y;
         camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level, camera->camera_z);
@@ -64,7 +64,7 @@ namespace EDITOR {
         RenderSprite_OnTile(preview, level, renderer, camera, x, y, 1, 0.5);
     }
 
-    void Update(Editor* editor, Input* input, LevelData* level, CommandBuffer* buffer, Camera* camera) {
+    void Update( Editor* editor, Input* input, LevelData* level, CommandBuffer* buffer, Camera* camera ) {
         float zoom = camera->camera_z;
         if (ImGui::GetIO().WantCaptureMouse) {
             return;

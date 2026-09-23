@@ -35,16 +35,16 @@ struct AudioSystem {
 
 extern AudioSystem* g_audioSystem;
 
-void PlaySFX(SFX_ID id, float volume = 1);
+void PlaySFX( SFX_ID id, float volume = 1 );
 
-void PlaySong(SONG_ID song);
+void PlaySong( SONG_ID song );
 
 namespace Audio {
-    void Initialize(AudioSystem* audio, Memory::Arena* arena_main);
+    void Initialize( AudioSystem* audio, Memory::Arena* arena_main );
 
-    void Update(AudioSystem* audio);
+    void Update( AudioSystem* audio );
 }
 
 namespace AssetManagement {
-    void LoadAllSFX(AudioSystem* audioSystem);
+    void LoadAllSFX( AudioSystem* audioSystem );
 }

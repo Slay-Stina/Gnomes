@@ -16,7 +16,7 @@ struct Sprite {
     int framerate;
 };
 
-inline int GetSpriteCount(Sprite* sprite) {
+inline int GetSpriteCount( Sprite* sprite ) {
     if (sprite->sprite_count_x == NOT_SET)
         return 1;
     if (sprite->sprite_count_y == NOT_SET)
@@ -35,19 +35,19 @@ struct SpriteRenderInfo {
         flipped = false;
     }
 
-    SpriteRenderInfo(int frame, Sprite* sprite) {
+    SpriteRenderInfo( int frame, Sprite* sprite ) {
         this->frame = frame;
         this->sprite = sprite;
         this->flipped = false;
     }
 
-    SpriteRenderInfo(int frame, Sprite* sprite, bool flipped) {
+    SpriteRenderInfo( int frame, Sprite* sprite, bool flipped ) {
         this->frame = frame;
         this->sprite = sprite;
         this->flipped = flipped;
     }
 
-    SpriteRenderInfo(Sprite* sprite) {
+    SpriteRenderInfo( Sprite* sprite ) {
         this->sprite = sprite;
         this->frame = 0;
         this->flipped = false;
@@ -81,13 +81,13 @@ enum class SPRITE_ID {
 
 class SpriteLibrary {
 public:
-    void LoadAll(SDL_Renderer* renderer, Memory::Arena* arena);
+    void LoadAll( SDL_Renderer* renderer, Memory::Arena* arena );
 
-    SpriteRenderInfo Get(ENTITY_ID id) const;
+    SpriteRenderInfo Get( ENTITY_ID id ) const;
 
-    SpriteRenderInfo GetSprite_FromEntityState(const Entity* entity, const uint64_t* ticks_total) const;
+    SpriteRenderInfo GetSprite_FromEntityState( const Entity* entity, const uint64_t* ticks_total ) const;
 
-    Sprite* GetBySpriteID(SPRITE_ID id) const;
+    Sprite* GetBySpriteID( SPRITE_ID id ) const;
 
 private:
     Sprite* sprites[(int) SPRITE_ID::COUNT] = {};

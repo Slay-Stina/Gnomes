@@ -7,7 +7,7 @@
 
 enum class FromRedo { No, Yes };
 
-void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* buffer, FromRedo from_redo = FromRedo::No) {
+void Execute( AnyCommand cmd, LevelData* level, CommandBuffer* buffer, FromRedo from_redo = FromRedo::No ) {
     switch (cmd.command.type) {
         case CMD_TYPE::NONE:
             break;
@@ -72,7 +72,7 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* buffer, FromRedo f
     }
 }
 
-void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* level) {
+void Push( CommandBuffer* buffer, AnyCommand cmd, LevelData* level ) {
     assert(cmd.command.type != CMD_TYPE::NONE);
     buffer->allCommands[buffer->index] = cmd;
     buffer->allCommands[buffer->index].command.timestamp = buffer->timestamp;
@@ -81,7 +81,7 @@ void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* level) {
     Execute(cmd, level, buffer, FromRedo::No);
 }
 
-void Undo(CommandBuffer* buffer, LevelData* level) {
+void Undo( CommandBuffer* buffer, LevelData* level ) {
     if (buffer->index == 0) {
         return;
     }
@@ -145,7 +145,7 @@ void Undo(CommandBuffer* buffer, LevelData* level) {
     }
 }
 
-void Redo(CommandBuffer* buffer, LevelData* level) {
+void Redo( CommandBuffer* buffer, LevelData* level ) {
     if (buffer->index == buffer->head) {
         return;
     }
@@ -161,7 +161,7 @@ void Redo(CommandBuffer* buffer, LevelData* level) {
     }
 }
 
-void ResetCommandBuffer(CommandBuffer* buffer) {
+void ResetCommandBuffer( CommandBuffer* buffer ) {
     buffer->index = 0;
     buffer->head = 0;
     buffer->timestamp = 0;

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-uint16_t Get_Tileset_ID_Offset_From_Tilemap(int id_limit, const Json::Value& tmj_result) {
+uint16_t Get_Tileset_ID_Offset_From_Tilemap( int id_limit, const Json::Value& tmj_result ) {
     int highest_tilemap_start_id = 0;
     for (const Json::Value& tileset: tmj_result["tilesets"]) {
         int first_id = tileset["firstgid"].asInt();
@@ -18,24 +18,24 @@ uint16_t Get_Tileset_ID_Offset_From_Tilemap(int id_limit, const Json::Value& tmj
     return highest_tilemap_start_id;
 }
 
-uint16_t GetLocalTileID(uint16_t id_global, const Json::Value& tmj_result) {
+uint16_t GetLocalTileID( uint16_t id_global, const Json::Value& tmj_result ) {
     return id_global - Get_Tileset_ID_Offset_From_Tilemap(id_global, tmj_result);
 }
 
 namespace {
     const TilesetDataEntry ALL_TILESETS_DATA[] = {
-            {TILESETS::Dungeon, "assets/tilesets/dungeon_tileset.tsj"}
+        {TILESETS::Dungeon, "assets/tilesets/dungeon_tileset.tsj"}
     };
 }
 
 namespace AssetManagement {
-    void LoadAllTilesets(Tileset* tilesetBuffer, Memory::Arena* arena_images) {
+    void LoadAllTilesets( Tileset* tilesetBuffer, Memory::Arena* arena_images ) {
         for (const TilesetDataEntry& entry: ALL_TILESETS_DATA) {
             LoadTileset(&entry, tilesetBuffer, arena_images);
         }
     }
 
-    void LoadTileset(const TilesetDataEntry* entry, Tileset* tilesetBuffer, Memory::Arena* arena_images) {
+    void LoadTileset( const TilesetDataEntry* entry, Tileset* tilesetBuffer, Memory::Arena* arena_images ) {
         assert(entry->type != TILESETS::COUNT);
         assert(entry->type != TILESETS::NONE);
 

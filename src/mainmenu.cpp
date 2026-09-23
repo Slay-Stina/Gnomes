@@ -8,7 +8,7 @@
 #include "rendering.h"
 #include "spriteLibrary.h"
 
-void Menu::Initialize(MainMenu* mainmenu, SpriteLibrary* sprites, Arena* arena_main) {
+void Menu::Initialize( MainMenu* mainmenu, SpriteLibrary* sprites, Arena* arena_main ) {
     assert(mainmenu->initialized == false);
     mainmenu->buttons_count = 2;
     mainmenu->buttons = ALLOC_ARRAY(arena_main, Button, mainmenu->buttons_count);
@@ -27,7 +27,7 @@ void Menu::Initialize(MainMenu* mainmenu, SpriteLibrary* sprites, Arena* arena_m
     mainmenu->initialized = true;
 }
 
-void Menu::Draw(MainMenu* mainmenu, SDL_Renderer* renderer, SpriteLibrary* sprites, Input* input) {
+void Menu::Draw( MainMenu* mainmenu, SDL_Renderer* renderer, SpriteLibrary* sprites, Input* input ) {
     float scale = (SCREEN_HEIGHT / ((float) mainmenu->background_horizon->height * UPSCALE_FACTOR));
     scale *= 1.2;
     float mouse_x = input->mouse_x;
@@ -51,14 +51,14 @@ void Menu::Draw(MainMenu* mainmenu, SDL_Renderer* renderer, SpriteLibrary* sprit
     }
 }
 
-void Menu::Update(GameData* data) {
+void Menu::Update( GameData* data ) {
     MainMenu* mainmenu = &data->scenes.mainMenu;
     Input* input = &data->input;
     mainmenu->activeButtonCount = GetActiveButtonCount(mainmenu->buttons, mainmenu->buttons_count);
     if (mainmenu->activeButtonCount == 0) {
         return;
     }
-    mainmenu->activeButtons = ALLOC_ARRAY(data->arena_scratch, Button*, mainmenu->activeButtonCount);
+    mainmenu->activeButtons = ALLOC_ARRAY(data->arena_scratch, Button *, mainmenu->activeButtonCount);
     int index = 0;
     for (int i = 0; i < mainmenu->buttons_count; i++) {
         if (mainmenu->buttons[i].active) {

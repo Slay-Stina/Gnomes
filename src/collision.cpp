@@ -10,6 +10,6 @@ x < bounds.x -> *   ▐      ▌  * <- x > bounds.x + bounds.w
                         * <- y > bounds.y + bounds.h
  */
 
-bool CheckCollisionInsideBounds(SDL_FRect bounds, float x, float y) {
+bool CheckCollisionInsideBounds( SDL_FRect bounds, float x, float y ) {
     return x >= bounds.x && x <= bounds.x + bounds.w && y >= bounds.y && y <= bounds.y + bounds.h;
 }

@@ -21,10 +21,10 @@ struct Button {
     bool active;
 };
 
-void PressButton(GameData* data, Button* button);
+void PressButton( GameData* data, Button* button );
 
-int GetActiveButtonCount(Button* buttons, int count);
+int GetActiveButtonCount( Button* buttons, int count );
 
-bool IsHoveredOver(Button* button, float x, float y);
+bool IsHoveredOver( Button* button, float x, float y );
 
-void SetupButton(Button* button, SpriteLibrary* sprites, ButtonType type, ButtonMode mode, SDL_FRect rect);
+void SetupButton( Button* button, SpriteLibrary* sprites, ButtonType type, ButtonMode mode, SDL_FRect rect );

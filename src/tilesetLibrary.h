@@ -22,12 +22,12 @@ struct TilesetDataEntry {
     const char* path;
 };
 
-uint16_t GetLocalTileID(uint16_t id_global, const Json::Value& tmj_result);
+uint16_t GetLocalTileID( uint16_t id_global, const Json::Value& tmj_result );
 
-uint16_t Get_Tileset_ID_Offset_From_Tilemap(int id_limit, const Json::Value& tmj_result);
+uint16_t Get_Tileset_ID_Offset_From_Tilemap( int id_limit, const Json::Value& tmj_result );
 
 namespace AssetManagement {
-    void LoadAllTilesets(Tileset* tilesetBuffer, Memory::Arena* arena_images);
+    void LoadAllTilesets( Tileset* tilesetBuffer, Memory::Arena* arena_images );
 
-    void LoadTileset(const TilesetDataEntry* entry, Tileset* tilesetBuffer, Memory::Arena* arena_images);
+    void LoadTileset( const TilesetDataEntry* entry, Tileset* tilesetBuffer, Memory::Arena* arena_images );
 }

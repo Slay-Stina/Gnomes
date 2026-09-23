@@ -19,28 +19,28 @@ namespace {
     };
 
     const SpriteDataEntry ALL_SPRITE_DATA[] = {
-            {SPRITE_ID::Fallback, FALLBACK_PATH, 8, 8},
-            {SPRITE_ID::Gnome_Rotate, "assets/sprites/gnome-Sheet.png", 8, 16, 3, 1},
-            {SPRITE_ID::Rock, "assets/sprites/rock.png", 9, 15},
-            {SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1, 8},
-            {SPRITE_ID::Medusa_Idle_Left, "assets/sprites/medusa_idle_left.png", 12, 24, 4, 1, 8},
-            {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24, 4, 1, 8},
-            {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24, 4, 1, 8},
-            {SPRITE_ID::Golem, "assets/sprites/golem.png", 8, 16},
-            {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 8},
-            {SPRITE_ID::black_1x1, "assets/sprites/1x1_black.png", 0, 0},
-            {SPRITE_ID::titlescreen_background, "assets/sprites/titlescreen.png", 325, 200},
-            {SPRITE_ID::selection_marker, "assets/sprites/selection_marker.png", 9, 9},
-            {SPRITE_ID::dungeon_tileset, "assets/sprites/hell_of_a_time_dungeon_tileset.png", 0, 0, 9, 9},
-            {SPRITE_ID::Goal, "assets/sprites/goal.png", 8, 8, 8, 1},
-            {SPRITE_ID::Menu_Horizon, "assets/sprites/mainmenu_background.png"},
-            {SPRITE_ID::Menu_Cloud_Back, "assets/sprites/mainmenu_cloud_back.png"},
-            {SPRITE_ID::Menu_Cloud_Front, "assets/sprites/mainmenu_cloud_front.png"},
-            {SPRITE_ID::Menu_Middle, "assets/sprites/mainmenu_middle.png"},
-            {SPRITE_ID::Menu_Front, "assets/sprites/mainmenu_front.png"},
+        {SPRITE_ID::Fallback, FALLBACK_PATH, 8, 8},
+        {SPRITE_ID::Gnome_Rotate, "assets/sprites/gnome-Sheet.png", 8, 16, 3, 1},
+        {SPRITE_ID::Rock, "assets/sprites/rock.png", 9, 15},
+        {SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1, 8},
+        {SPRITE_ID::Medusa_Idle_Left, "assets/sprites/medusa_idle_left.png", 12, 24, 4, 1, 8},
+        {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24, 4, 1, 8},
+        {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24, 4, 1, 8},
+        {SPRITE_ID::Golem, "assets/sprites/golem.png", 8, 16},
+        {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 8},
+        {SPRITE_ID::black_1x1, "assets/sprites/1x1_black.png", 0, 0},
+        {SPRITE_ID::titlescreen_background, "assets/sprites/titlescreen.png", 325, 200},
+        {SPRITE_ID::selection_marker, "assets/sprites/selection_marker.png", 9, 9},
+        {SPRITE_ID::dungeon_tileset, "assets/sprites/hell_of_a_time_dungeon_tileset.png", 0, 0, 9, 9},
+        {SPRITE_ID::Goal, "assets/sprites/goal.png", 8, 8, 8, 1},
+        {SPRITE_ID::Menu_Horizon, "assets/sprites/mainmenu_background.png"},
+        {SPRITE_ID::Menu_Cloud_Back, "assets/sprites/mainmenu_cloud_back.png"},
+        {SPRITE_ID::Menu_Cloud_Front, "assets/sprites/mainmenu_cloud_front.png"},
+        {SPRITE_ID::Menu_Middle, "assets/sprites/mainmenu_middle.png"},
+        {SPRITE_ID::Menu_Front, "assets/sprites/mainmenu_front.png"},
     };
 
-    void LoadOne(Sprite* sprite, const SpriteDataEntry& entry, SDL_Renderer* renderer) {
+    void LoadOne( Sprite* sprite, const SpriteDataEntry& entry, SDL_Renderer* renderer ) {
         SDL_Surface* surface = IMG_Load(entry.path);
         if (surface == nullptr)
             surface = IMG_Load(FALLBACK_PATH);
@@ -62,7 +62,7 @@ namespace {
     }
 }
 
-void SpriteLibrary::LoadAll(SDL_Renderer* renderer, Memory::Arena* arena) {
+void SpriteLibrary::LoadAll( SDL_Renderer* renderer, Memory::Arena* arena ) {
     for (const SpriteDataEntry& entry: ALL_SPRITE_DATA) {
         Sprite* sprite = ALLOC(arena, Sprite);
         LoadOne(sprite, entry, renderer);
@@ -70,7 +70,7 @@ void SpriteLibrary::LoadAll(SDL_Renderer* renderer, Memory::Arena* arena) {
     }
 }
 
-SpriteRenderInfo SpriteLibrary::Get(ENTITY_ID id) const {
+SpriteRenderInfo SpriteLibrary::Get( ENTITY_ID id ) const {
     SPRITE_ID spriteId = SPRITE_ID::Fallback;
     switch (id) {
         case ENTITY_ID::ROCK:
@@ -90,7 +90,7 @@ SpriteRenderInfo SpriteLibrary::Get(ENTITY_ID id) const {
     return GetBySpriteID(spriteId);
 }
 
-SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState(const Entity* entity, const uint64_t* ticks_total) const {
+SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState( const Entity* entity, const uint64_t* ticks_total ) const {
     if (HasBehaviour(entity, IS_PETRIFIED)) {
         return GetBySpriteID(SPRITE_ID::Rock);
     }
@@ -181,7 +181,7 @@ SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState(const Entity* entity, 
     return GetBySpriteID(SPRITE_ID::Fallback);
 }
 
-Sprite* SpriteLibrary::GetBySpriteID(SPRITE_ID id) const {
+Sprite* SpriteLibrary::GetBySpriteID( SPRITE_ID id ) const {
     Sprite* s = sprites[(int) id];
     return s && s->texture ? s : sprites[(int) SPRITE_ID::Fallback];
 }

@@ -8,7 +8,7 @@
 #include "levels.h"
 
 namespace {
-    bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDir, int yDir, int strength) {
+    bool TryMove( Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDir, int yDir, int strength ) {
         if (strength < 0) {
             return false;
         }
@@ -39,7 +39,7 @@ namespace {
     }
 }
 
-void Game::Initialize(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer) {
+void Game::Initialize( Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer ) {
     assert(gameplay->initialized == false);
     gameplay->currentLevelIndex = 0;
     gameplay->activePlayerIndex = 0;
@@ -50,8 +50,8 @@ void Game::Initialize(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetB
     gameplay->initialized = true;
 }
 
-void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena* arena_commands, Arena* arena_entities,
-                  float dt) {
+void Game::Update( Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena* arena_commands, Arena* arena_entities,
+                   float dt ) {
     if (KeyPressed(input, SDL_SCANCODE_R)) {
         StartLevel(gameplay, arena_commands, arena_entities);
         return;
@@ -142,7 +142,7 @@ void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena*
     }
 
     Entity* entity = GetActiveEntity(gameplay);
-    if (!HasBehaviour(entity, (Behaviour) (RESPOND_TO_INPUT | CAN_MOVE))) {
+    if (!HasBehaviour(entity, (Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))) {
         return;
     }
     if (HasBehaviour(entity, IS_PETRIFIED)) {
@@ -155,15 +155,15 @@ void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena*
         ResetKeyHeldTime(input, SDL_SCANCODE_RIGHT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {1, 0};
     } else if (KeyPressed(input, SDL_SCANCODE_LEFT) || KeyHeld_ForTime(
-                       input, SDL_SCANCODE_LEFT, 1 / MOVE_SPEED * 1.15)) {
+                   input, SDL_SCANCODE_LEFT, 1 / MOVE_SPEED * 1.15)) {
         ResetKeyHeldTime(input, SDL_SCANCODE_LEFT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {-1, 0};
     } else if (KeyPressed(input, SDL_SCANCODE_UP) || KeyHeld_ForTime(
-                       input, SDL_SCANCODE_UP, 1 / MOVE_SPEED * 1.15)) {
+                   input, SDL_SCANCODE_UP, 1 / MOVE_SPEED * 1.15)) {
         ResetKeyHeldTime(input, SDL_SCANCODE_UP);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, -1};
     } else if (KeyPressed(input, SDL_SCANCODE_DOWN) || KeyHeld_ForTime(
-                       input, SDL_SCANCODE_DOWN, 1 / MOVE_SPEED * 1.15)) {
+                   input, SDL_SCANCODE_DOWN, 1 / MOVE_SPEED * 1.15)) {
         ResetKeyHeldTime(input, SDL_SCANCODE_DOWN);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, 1};
     }
@@ -223,12 +223,12 @@ void Game::Update(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena*
     }
 }
 
-void Game::Draw(GameData* data, SDL_Renderer* renderer) {
+void Game::Draw( GameData* data, SDL_Renderer* renderer ) {
     RenderLevel(data, renderer);
     RenderEntities(data, renderer);
 }
 
-void Game::StartLevel(Gameplay* gameplay, Arena* arena_commands, Arena* arena_entities) {
+void Game::StartLevel( Gameplay* gameplay, Arena* arena_commands, Arena* arena_entities ) {
     ResetCommandBuffer(gameplay->commandBuffer);
     Reset(arena_commands);
     CreateEntities(&gameplay->levels[gameplay->currentLevelIndex], arena_entities);

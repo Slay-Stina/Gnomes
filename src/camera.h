@@ -8,9 +8,9 @@ struct Camera {
 };
 
 namespace camera {
-    void GridToWorld(float* x, float* y, const LevelData* lvl, float zoom);
+    void GridToWorld( float* x, float* y, const LevelData* lvl, float zoom );
 
-    void WorldToGrid(float x_world, float y_world, int* x, int* y, const LevelData* lvl, float zoom);
+    void WorldToGrid( float x_world, float y_world, int* x, int* y, const LevelData* lvl, float zoom );
 
-    bool GetIsPointInsideGrid(float x, float y, const LevelData* lvl, float zoom);
+    bool GetIsPointInsideGrid( float x, float y, const LevelData* lvl, float zoom );
 }

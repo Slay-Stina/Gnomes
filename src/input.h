@@ -23,28 +23,28 @@ enum class MouseButtons {
     COUNT = 3
 };
 
-bool AnyKeyPressed(const Input* input);
+bool AnyKeyPressed( const Input* input );
 
-bool KeyPressed(const Input* input, SDL_Scancode key);
+bool KeyPressed( const Input* input, SDL_Scancode key );
 
-bool KeyHeld(const Input* input, SDL_Scancode key);
+bool KeyHeld( const Input* input, SDL_Scancode key );
 
-bool KeyReleased(const Input* input, SDL_Scancode key);
+bool KeyReleased( const Input* input, SDL_Scancode key );
 
-bool KeyHeld_ForTime(const Input* input, SDL_Scancode key, float min_length);
+bool KeyHeld_ForTime( const Input* input, SDL_Scancode key, float min_length );
 
-void UpdateKeys(Input* input, float dt);
+void UpdateKeys( Input* input, float dt );
 
-void ResetKeyHeldTime(Input* input, SDL_Scancode key);
+void ResetKeyHeldTime( Input* input, SDL_Scancode key );
 
-bool MousePressed(const Input* input, MouseButtons button);
+bool MousePressed( const Input* input, MouseButtons button );
 
-bool MouseReleased(const Input* input, MouseButtons button);
+bool MouseReleased( const Input* input, MouseButtons button );
 
-bool MouseHeld(const Input* input, MouseButtons button);
+bool MouseHeld( const Input* input, MouseButtons button );
 
-bool MouseHeld_ForTime(const Input* input, MouseButtons button, float min_length);
+bool MouseHeld_ForTime( const Input* input, MouseButtons button, float min_length );
 
-void UpdateMouse(Input* input, float dt);
+void UpdateMouse( Input* input, float dt );
 
-void ResetAll(Input*);
+void ResetAll( Input* );

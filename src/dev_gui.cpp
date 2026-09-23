@@ -12,7 +12,7 @@
 using namespace std;
 
 namespace {
-    string FormatBytes(size_t bytes) {
+    string FormatBytes( size_t bytes ) {
         char buf[32];
         if (bytes >= GIGABYTES(1)) {
             snprintf(buf, sizeof(buf), "%.1f GB", AS_GIGABYTES(bytes));
@@ -27,13 +27,13 @@ namespace {
     }
 }
 
-void Draw_Imgui_Arena_Usage(Arena* arena, const std::string& name_of_arena) {
+void Draw_Imgui_Arena_Usage( Arena* arena, const std::string& name_of_arena ) {
     float fraction = (float) arena->used / (float) arena->size;
     string barText = name_of_arena + " " + FormatBytes(arena->used) + " / " + FormatBytes(arena->size);
     ImGui::ProgressBar(fraction, ImVec2(-1, 0), barText.c_str());
 }
 
-void Draw_History(CommandBuffer* buffer, LevelData* level) {
+void Draw_History( CommandBuffer* buffer, LevelData* level ) {
     int sliderPos = buffer->index;
     if (ImGui::SliderInt("history", &sliderPos, 0, buffer->head)) {
         while (buffer->index > sliderPos) {
@@ -45,7 +45,7 @@ void Draw_History(CommandBuffer* buffer, LevelData* level) {
     }
 }
 
-void DrawFPS(GameData* data) {
+void DrawFPS( GameData* data ) {
     EditorData* editor = &data->editor_data;
     float fps = 1.0 / *data->dt * *data->dt_scaler;
     editor->fps_buffer[editor->fps_buffer_index++] = fps;
@@ -53,8 +53,8 @@ void DrawFPS(GameData* data) {
     ImVec4 color = fps >= 55
                        ? ImVec4(0.3f, 1, 0.3f, 1)
                        : fps >= 30
-                       ? ImVec4(1, 0.8f, 0.2f, 1)
-                       : ImVec4(1, 0.3f, 0.3f, 1);
+                             ? ImVec4(1, 0.8f, 0.2f, 1)
+                             : ImVec4(1, 0.3f, 0.3f, 1);
     ImGui::TextColored(color, "FPS: %.0f", fps);
     ImGui::PlotLines("##fps", editor->fps_buffer, FPS_BUFFER_COUNT, 0, nullptr, 0, TARGET_FPS, ImVec2(-1, 35));
     float ms = 1000.0f / fps;
@@ -62,7 +62,7 @@ void DrawFPS(GameData* data) {
     ImGui::ProgressBar(ms / 33.3f, ImVec2(-1, 0)); // 0=bra, 1=33ms=30fps
 }
 
-void DEV::Initialize(SDL_Window* window, SDL_Renderer* renderer) {
+void DEV::Initialize( SDL_Window* window, SDL_Renderer* renderer ) {
     ImGui::CreateContext();
     ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer3_Init(renderer);
@@ -72,11 +72,11 @@ void DEV::Initialize(SDL_Window* window, SDL_Renderer* renderer) {
     io.DisplaySize = ImVec2((float) w, (float) h);
 }
 
-void DEV::ProcessEvents(SDL_Event* event) {
+void DEV::ProcessEvents( SDL_Event* event ) {
     ImGui_ImplSDL3_ProcessEvent(event);
 }
 
-void DEV::PreDraw(ImGuiContext* saved_context) {
+void DEV::PreDraw( ImGuiContext* saved_context ) {
     if (ImGui::GetCurrentContext() == nullptr) {
         ImGui::SetCurrentContext(saved_context);
     }
@@ -85,7 +85,7 @@ void DEV::PreDraw(ImGuiContext* saved_context) {
     ImGui::NewFrame();
 }
 
-void DEV::Draw(GameData* data, SDL_Renderer* renderer) {
+void DEV::Draw( GameData* data, SDL_Renderer* renderer ) {
     Gameplay* gameplay = &data->scenes.gameplay;
 
     if (data->editor_data.show_dev) {

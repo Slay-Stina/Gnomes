@@ -27,12 +27,12 @@ const float LEVEL_COMPLETE_DELAY = 0.3f;
 
 const int MOUSE_BUTTON_COUNT = 3;
 
-inline void Expand1DTo2D(int flatIndex, int width, int* x, int* y) {
+inline void Expand1DTo2D( int flatIndex, int width, int* x, int* y ) {
     *x = flatIndex % width;
     *y = flatIndex / width;
 }
 
-inline void Expand1DTo2D(int flatIndex, int width, float* x, float* y) {
+inline void Expand1DTo2D( int flatIndex, int width, float* x, float* y ) {
     *x = (float) (flatIndex % width);
     *y = (float) (flatIndex / width);
 }

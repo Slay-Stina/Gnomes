@@ -3,7 +3,7 @@
 #include "button.h"
 #include "common.h"
 
-void RenderButton(Button* button, bool is_selected, SDL_Renderer* renderer) {
+void RenderButton( Button* button, bool is_selected, SDL_Renderer* renderer ) {
     SDL_Texture* texture = button->texture;
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_PIXELART);
     uint8_t colorOverlay = is_selected ? 255 : 230;
@@ -12,14 +12,14 @@ void RenderButton(Button* button, bool is_selected, SDL_Renderer* renderer) {
     SDL_RenderTexture(renderer, button->texture, nullptr, &button->rect);
 }
 
-void RenderTile(Sprite* tileset, int cell_id, LevelData* level, SDL_Renderer* renderer,
-                const Camera* camera, float x, float y, float scale, float alpha) {
+void RenderTile( Sprite* tileset, int cell_id, LevelData* level, SDL_Renderer* renderer,
+                 const Camera* camera, float x, float y, float scale, float alpha ) {
     camera::GridToWorld(&x, &y, level, camera->camera_z);
     RenderSprite_World({cell_id, tileset}, renderer, camera, x, y, scale, alpha, false);
 }
 
-void RenderSprite_OnTile(SpriteRenderInfo spriteInfo, LevelData* lvl, SDL_Renderer* renderer,
-                         const Camera* camera, float x, float y, float scale, float alpha, bool flipped) {
+void RenderSprite_OnTile( SpriteRenderInfo spriteInfo, LevelData* lvl, SDL_Renderer* renderer,
+                          const Camera* camera, float x, float y, float scale, float alpha, bool flipped ) {
     float zoom = camera->camera_z;
     camera::GridToWorld(&x, &y, lvl, zoom);
     x += TILE_SIZE_PX_SCALED * zoom / 2.0f;
@@ -27,8 +27,8 @@ void RenderSprite_OnTile(SpriteRenderInfo spriteInfo, LevelData* lvl, SDL_Render
     RenderSprite_World(spriteInfo, renderer, camera, x, y, scale, alpha, flipped);
 }
 
-void RenderSprite_World(SpriteRenderInfo spriteRenderInfo, SDL_Renderer* renderer, const Camera* camera,
-                        float x, float y, float scale, float alpha, bool flipped) {
+void RenderSprite_World( SpriteRenderInfo spriteRenderInfo, SDL_Renderer* renderer, const Camera* camera,
+                         float x, float y, float scale, float alpha, bool flipped ) {
     int frame = spriteRenderInfo.frame;
     Sprite* sprite = spriteRenderInfo.sprite;
 

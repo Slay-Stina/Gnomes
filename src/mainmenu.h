@@ -27,9 +27,9 @@ struct MainMenu {
 };
 
 namespace Menu {
-    void Initialize(MainMenu* mainmenu, SpriteLibrary* sprites, Memory::Arena* arena_main);
+    void Initialize( MainMenu* mainmenu, SpriteLibrary* sprites, Memory::Arena* arena_main );
 
-    void Update(GameData* data);
+    void Update( GameData* data );
 
-    void Draw(MainMenu* mainmenu, SDL_Renderer* renderer, SpriteLibrary* sprites, Input* input);
+    void Draw( MainMenu* mainmenu, SDL_Renderer* renderer, SpriteLibrary* sprites, Input* input );
 }

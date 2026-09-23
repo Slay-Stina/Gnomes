@@ -33,7 +33,7 @@ enum class Direction {
     UP
 };
 
-inline Direction DirectionFromXY(int xDir, int yDir) {
+inline Direction DirectionFromXY( int xDir, int yDir ) {
     assert(xDir * yDir == 0);
     if (xDir == 1)
         return Direction::RIGHT;
@@ -71,20 +71,20 @@ struct Entity {
     Direction facing_previous;
 };
 
-bool IsActing(Entity* e);
+bool IsActing( Entity* e );
 
-bool HasBehaviour(const Entity* entity, Behaviour flags);
+bool HasBehaviour( const Entity* entity, Behaviour flags );
 
-void InitializeBaseBehaviour(Entity* entity);
+void InitializeBaseBehaviour( Entity* entity );
 
-void SetBehaviour(Entity* entity, Behaviour flags);
+void SetBehaviour( Entity* entity, Behaviour flags );
 
-void AddBehaviour(Entity* entity, Behaviour flags);
+void AddBehaviour( Entity* entity, Behaviour flags );
 
-void RemoveBehaviour(Entity* entity, Behaviour flags);
+void RemoveBehaviour( Entity* entity, Behaviour flags );
 
-void PostMove(Entity* entity, LevelData* level, CommandBuffer* commandBuffer);
+void PostMove( Entity* entity, LevelData* level, CommandBuffer* commandBuffer );
 
-void PostRotation(Entity* entity, LevelData* level, CommandBuffer* commandBuffer, Direction from, Direction to);
+void PostRotation( Entity* entity, LevelData* level, CommandBuffer* commandBuffer, Direction from, Direction to );
 
-void PreRotation(Entity* entity, LevelData* level, CommandBuffer* commandBuffer, Direction from, Direction to);
+void PreRotation( Entity* entity, LevelData* level, CommandBuffer* commandBuffer, Direction from, Direction to );

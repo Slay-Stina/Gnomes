@@ -6,7 +6,7 @@
 #include "core.h"
 #include "gameState.h"
 
-void PressButton(GameData* data, Button* button) {
+void PressButton( GameData* data, Button* button ) {
     if (button == nullptr)
         return;
     assert(button->active);
@@ -23,7 +23,7 @@ void PressButton(GameData* data, Button* button) {
     }
 }
 
-int GetActiveButtonCount(Button* buttons, int count) {
+int GetActiveButtonCount( Button* buttons, int count ) {
     if (count == 0) {
         return 0;
     }
@@ -35,14 +35,14 @@ int GetActiveButtonCount(Button* buttons, int count) {
     return activeButtons;
 }
 
-bool IsHoveredOver(Button* button, float x, float y) {
+bool IsHoveredOver( Button* button, float x, float y ) {
     if (button == nullptr || !button->active)
         return false;
     assert(button->type != ButtonType::NONE);
     return CheckCollisionInsideBounds(button->rect, x, y);
 }
 
-void SetupButton(Button* button, SpriteLibrary* sprites, ButtonType type, ButtonMode mode, SDL_FRect rect) {
+void SetupButton( Button* button, SpriteLibrary* sprites, ButtonType type, ButtonMode mode, SDL_FRect rect ) {
     assert(type != ButtonType::NONE);
     button->type = type;
     button->mode = mode;

@@ -9,17 +9,17 @@
 
 using namespace std;
 
-void StoreGameState(Arena* arena) {
+void StoreGameState( Arena* arena ) {
     std::ofstream file("temp_state.bin", std::ios::binary);
     file.write(reinterpret_cast<const char*>(arena->base), arena->size);
 }
 
-void RetrieveGameState(Arena* arena) {
+void RetrieveGameState( Arena* arena ) {
     std::ifstream file("temp_state.bin", std::ios::binary);
     file.read(reinterpret_cast<char*>(arena->base), arena->size);
 }
 
-void ChangeScene(GameData* data, SCENE_TYPES new_scene) {
+void ChangeScene( GameData* data, SCENE_TYPES new_scene ) {
     assert(new_scene != data->scene_current);
     data->scene_previous = data->scene_current;
     data->scene_current = new_scene;
@@ -48,7 +48,7 @@ void ChangeScene(GameData* data, SCENE_TYPES new_scene) {
     }
 }
 
-void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer) {
+void DrawScene( GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer ) {
     switch (scene) {
         case SCENE_TYPES::TITLESCREEN: {
             Sprite* background = data->sprites.GetBySpriteID(SPRITE_ID::titlescreen_background);
@@ -71,7 +71,7 @@ void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer) {
 }
 
 extern "C" {
-void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer) {
+void Initialize( GameData* data, SDL_Window* window, SDL_Renderer* renderer ) {
     *data->ticks_total = 0;
     data->camera.camera_z = 1.0f;
     DEV::Initialize(window, renderer);
@@ -88,7 +88,7 @@ void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer) {
     ChangeScene(data, SCENE_TYPES::MAINMENU);
 }
 
-bool HandleEvents(Arena* arena, SDL_Event& event) {
+bool HandleEvents( Arena* arena, SDL_Event& event ) {
     DEV::ProcessEvents(&event);
     if (event.type == SDL_EVENT_KEY_DOWN) {
         if (event.key.key == SDLK_S) {
@@ -104,7 +104,7 @@ bool HandleEvents(Arena* arena, SDL_Event& event) {
     return true;
 }
 
-void Update(GameData* data, float dt) {
+void Update( GameData* data, float dt ) {
     *data->ticks_total += 1;
     Audio::Update(&data->audio);
     Gameplay* gameplay = &data->scenes.gameplay;
@@ -164,7 +164,7 @@ void Update(GameData* data, float dt) {
     }
 }
 
-void Draw(GameData* data, SDL_Renderer* renderer) {
+void Draw( GameData* data, SDL_Renderer* renderer ) {
     DEV::PreDraw(data->imGui_context);
     SDL_SetRenderDrawColor(renderer, 143, 86, 59, 255);
     SDL_RenderClear(renderer);
@@ -193,7 +193,7 @@ void Draw(GameData* data, SDL_Renderer* renderer) {
     SDL_RenderPresent(renderer);
 }
 
-void OnQuit(SDL_Renderer* renderer) {
+void OnQuit( SDL_Renderer* renderer ) {
     SDL_DestroyRenderer(renderer);
 }
 }
