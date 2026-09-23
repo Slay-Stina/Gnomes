@@ -51,7 +51,7 @@ void ChangeScene( GameData* data, SCENE_TYPES new_scene ) {
 void DrawScene( GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer ) {
     switch (scene) {
         case SCENE_TYPES::TITLESCREEN: {
-            Sprite* background = data->sprites.GetBySpriteID(SPRITE_ID::titlescreen_background);
+            Sprite* background = data->sprites.GetSprite(SPRITE_ID::titlescreen_background);
             Camera screen_camera = {0, 0, 1};
             RenderSprite_World(background, renderer, &screen_camera, 0, 0);
             break;
@@ -83,10 +83,10 @@ void Initialize( GameData* data, SDL_Window* window, SDL_Renderer* renderer ) {
     data->font.LoadFont(renderer, "assets/fonts/ByteBounce.ttf", 48);
     AssetManagement::LoadAllTilesets(data->tilesetBuffer, data->arena_images);
     data->imGui_context = ImGui::GetCurrentContext();
-    SDL_Texture* blackfade = data->sprites.GetBySpriteID(SPRITE_ID::black_1x1)->texture;
+    SDL_Texture* blackfade = data->sprites.GetSprite(SPRITE_ID::black_1x1)->texture;
     SDL_SetTextureBlendMode(blackfade, SDL_BLENDMODE_BLEND);
     Game::Initialize(&data->scenes.gameplay, data->arena_levels, data->tilesetBuffer);
-    Menu::Initialize(&data->scenes.mainMenu, &data->sprites, data->arena_main);
+    Menu::Initialize(&data->scenes.mainMenu, &data->sprites, &data->font, data->arena_main);
     PlaySong(SONG_ID::THEME);
     ChangeScene(data, SCENE_TYPES::MAINMENU);
 }
@@ -180,14 +180,14 @@ void Draw( GameData* data, SDL_Renderer* renderer ) {
         case Transition::FadeTo: {
             DrawScene(data, data->scene_previous, renderer);
             float alpha = data->transition.fade_time_elapsed / data->transition.fade_time_duration;
-            RenderSprite_World(data->sprites.GetBySpriteID(SPRITE_ID::black_1x1), renderer,
+            RenderSprite_World(data->sprites.GetSprite(SPRITE_ID::black_1x1), renderer,
                                &screen_camera, 0, 0, SCREEN_WIDTH, alpha);
             break;
         }
         case Transition::FadeFrom: {
             DrawScene(data, data->scene_current, renderer);
             float alpha = 1 - data->transition.fade_time_elapsed / data->transition.fade_time_duration;
-            RenderSprite_World(data->sprites.GetBySpriteID(SPRITE_ID::black_1x1), renderer,
+            RenderSprite_World(data->sprites.GetSprite(SPRITE_ID::black_1x1), renderer,
                                &screen_camera, 0, 0, SCREEN_WIDTH, alpha);
             break;
         }

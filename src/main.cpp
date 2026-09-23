@@ -243,6 +243,7 @@ int main() {
     }
 
     dll.OnQuit(renderer);
+    TTF_Quit();
     SDL_Quit();
     return 0;
 }

@@ -1,5 +1,7 @@
 #pragma once
+#include "spriteLibrary.h"
 
+struct FontAtlas;
 struct Input;
 
 namespace Memory {
@@ -9,8 +11,6 @@ namespace Memory {
 struct GameData;
 struct SDL_Renderer;
 struct Button;
-struct Sprite;
-class SpriteLibrary;
 
 struct MainMenu {
     Button* buttons;
@@ -27,7 +27,7 @@ struct MainMenu {
 };
 
 namespace Menu {
-    void Initialize( MainMenu* mainmenu, SpriteLibrary* sprites, Memory::Arena* arena_main );
+    void Initialize( MainMenu* mainmenu, SpriteLibrary* sprites, FontAtlas* font, Memory::Arena* arena_main );
 
     void Update( GameData* data );
 

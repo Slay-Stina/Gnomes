@@ -76,6 +76,7 @@ enum class SPRITE_ID {
     Menu_Cloud_Front,
     Menu_Middle,
     Menu_Front,
+    Button_Basic,
     COUNT // COUNT = antal, sista värdet
 };
 
@@ -83,11 +84,11 @@ class SpriteLibrary {
 public:
     void LoadAll( SDL_Renderer* renderer, Memory::Arena* arena );
 
-    SpriteRenderInfo Get( ENTITY_ID id ) const;
+    SpriteRenderInfo GetSprite( ENTITY_ID id ) const;
 
     SpriteRenderInfo GetSprite_FromEntityState( const Entity* entity, const uint64_t* ticks_total ) const;
 
-    Sprite* GetBySpriteID( SPRITE_ID id ) const;
+    Sprite* GetSprite( SPRITE_ID id ) const;
 
 private:
     Sprite* sprites[(int) SPRITE_ID::COUNT] = {};

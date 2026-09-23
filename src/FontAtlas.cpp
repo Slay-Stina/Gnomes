@@ -3,8 +3,12 @@
 #include "SDL3_ttf/SDL_ttf.h"
 #include <cassert>
 
-void FontAtlas::LoadFont( SDL_Renderer* renderer, const char* font_path, float ptsize ) {
-    TTF_Font* font = TTF_OpenFont(font_path, ptsize);
+#include "common.h"
+
+void FontAtlas::LoadFont( SDL_Renderer* renderer, const char* fontPath, float ptsize ) {
+    TTF_Font* font = TTF_OpenFont(fontPath, ptsize);
+    FontPath = fontPath;
+    FontSize = ptsize;
     assert(font != nullptr);
     int atlas_size = 1024;
     SDL_Surface* atlas_surface = SDL_CreateSurface(atlas_size, atlas_size, SDL_PIXELFORMAT_RGBA32);
@@ -34,7 +38,7 @@ void FontAtlas::LoadFont( SDL_Renderer* renderer, const char* font_path, float p
         draw_point_x += glyph_surface->w;
         SDL_DestroySurface(glyph_surface);
     }
-    atlasTexture = SDL_CreateTextureFromSurface(renderer, atlas_surface);
+    AtlasTexture = SDL_CreateTextureFromSurface(renderer, atlas_surface);
     SDL_DestroySurface(atlas_surface);
     TTF_CloseFont(font);
 }

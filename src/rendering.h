@@ -16,6 +16,8 @@ void RenderText( FontAtlas* atlas, const char* text, SDL_Renderer* renderer, Cam
 
 void RenderButton( Button* button, bool is_selected, SDL_Renderer* renderer );
 
+void RenderButton_Dynamic( Button* button, bool is_selected, SDL_Renderer* renderer );
+
 void RenderTile( Sprite* tileset, int cell_id, LevelData* level, SDL_Renderer* renderer,
                  const Camera* camera, float x, float y, float scale, float alpha );
 

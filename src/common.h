@@ -27,6 +27,12 @@ const float LEVEL_COMPLETE_DELAY = 0.3f;
 
 const int MOUSE_BUTTON_COUNT = 3;
 
+static const char STOP_CHAR = '\0';
+
+inline bool IsStringEmpty( const char* str ) {
+    return str == nullptr || str[0] == STOP_CHAR;
+}
+
 inline void Expand1DTo2D( int flatIndex, int width, int* x, int* y ) {
     *x = flatIndex % width;
     *y = flatIndex / width;
