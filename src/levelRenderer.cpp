@@ -12,7 +12,7 @@ void RenderLevel( GameData* gameData, SDL_Renderer* renderer ) {
     Sprite* tileset;
     switch (level->tileset->type) {
         case TILESETS::Dungeon:
-            tileset = gameData->sprites.GetBySpriteID(SPRITE_ID::dungeon_tileset);
+            tileset = gameData->sprites.GetSprite(SPRITE_ID::dungeon_tileset);
             break;
         case TILESETS::NONE:
         case TILESETS::COUNT:
@@ -28,7 +28,7 @@ void RenderLevel( GameData* gameData, SDL_Renderer* renderer ) {
     }
     for (int i = 0; i < level->goalCount; i++) {
         Goal goal = level->goals[i];
-        Sprite* sprite = gameData->sprites.GetBySpriteID(SPRITE_ID::Goal);
+        Sprite* sprite = gameData->sprites.GetSprite(SPRITE_ID::Goal);
         int frame = (int) (goal.blink_timer / 0.2) % (sprite->sprite_count_x * sprite->sprite_count_y);
         RenderSprite_OnTile({frame, sprite}, level, renderer, &gameData->camera, goal.x, goal.y);
     }
@@ -61,10 +61,10 @@ void RenderEntities( GameData* data, SDL_Renderer* renderer ) {
         if (entity->action == Actions::MOVING && HasBehaviour(entity, JUMPS) && !HasBehaviour(entity, IS_PUSHING)) {
             y_animated -= 0.5 * sinf(entity->progress_01 * M_PI);
         }
-        Sprite* dropshadow = data->sprites.GetBySpriteID(SPRITE_ID::Dropshadow);
+        Sprite* dropshadow = data->sprites.GetSprite(SPRITE_ID::Dropshadow);
         RenderSprite_OnTile(dropshadow, lvl, renderer, &data->camera, x_animated, ground_y, 1, 0.4, false);
         if (entity == activeEntity) {
-            SpriteRenderInfo marker = data->sprites.GetBySpriteID(SPRITE_ID::selection_marker);
+            SpriteRenderInfo marker = data->sprites.GetSprite(SPRITE_ID::selection_marker);
             RenderSprite_OnTile(marker, lvl, renderer, &data->camera, x_animated, ground_y);
         }
         RenderSprite_OnTile(sprite, lvl, renderer, &data->camera, x_animated, y_animated, 1, 1, sprite.flipped);

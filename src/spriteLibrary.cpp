@@ -38,6 +38,7 @@ namespace {
         {SPRITE_ID::Menu_Cloud_Front, "assets/sprites/mainmenu_cloud_front.png"},
         {SPRITE_ID::Menu_Middle, "assets/sprites/mainmenu_middle.png"},
         {SPRITE_ID::Menu_Front, "assets/sprites/mainmenu_front.png"},
+        {SPRITE_ID::Button_Basic, "assets/sprites/basic_button.png", 0, 0, 3, 3},
     };
 
     void LoadOne( Sprite* sprite, const SpriteDataEntry& entry, SDL_Renderer* renderer ) {
@@ -70,7 +71,7 @@ void SpriteLibrary::LoadAll( SDL_Renderer* renderer, Memory::Arena* arena ) {
     }
 }
 
-SpriteRenderInfo SpriteLibrary::Get( ENTITY_ID id ) const {
+SpriteRenderInfo SpriteLibrary::GetSprite( ENTITY_ID id ) const {
     SPRITE_ID spriteId = SPRITE_ID::Fallback;
     switch (id) {
         case ENTITY_ID::ROCK:
@@ -83,19 +84,19 @@ SpriteRenderInfo SpriteLibrary::Get( ENTITY_ID id ) const {
             spriteId = SPRITE_ID::Golem;
             break;
         case ENTITY_ID::MEDUSA:
-            return {4, GetBySpriteID(SPRITE_ID::Medusa_Rotate)};
+            return {4, GetSprite(SPRITE_ID::Medusa_Rotate)};
         case ENTITY_ID::SIREN:
             break;
     }
-    return GetBySpriteID(spriteId);
+    return GetSprite(spriteId);
 }
 
 SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState( const Entity* entity, const uint64_t* ticks_total ) const {
     if (HasBehaviour(entity, IS_PETRIFIED)) {
-        return GetBySpriteID(SPRITE_ID::Rock);
+        return GetSprite(SPRITE_ID::Rock);
     }
     if (entity->id == ENTITY_ID::MEDUSA && entity->action == Actions::ROTATING) {
-        Sprite* spritesheet = GetBySpriteID(SPRITE_ID::Medusa_Rotate);
+        Sprite* spritesheet = GetSprite(SPRITE_ID::Medusa_Rotate);
         int start = 0;
         int end = 0;
         switch (entity->facing_previous) {
@@ -139,26 +140,26 @@ SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState( const Entity* entity,
             int frame = 0;
             switch (entity->facing_current) {
                 case Direction::RIGHT:
-                    sprite = GetBySpriteID(SPRITE_ID::Medusa_Idle_Left);
+                    sprite = GetSprite(SPRITE_ID::Medusa_Idle_Left);
                     frame = (int) (*ticks_total * sprite->framerate / TARGET_FPS % GetSpriteCount(sprite));
                     return {frame, sprite, true};
                 case Direction::LEFT:
-                    sprite = GetBySpriteID(SPRITE_ID::Medusa_Idle_Left);
+                    sprite = GetSprite(SPRITE_ID::Medusa_Idle_Left);
                     frame = (int) (*ticks_total * sprite->framerate / TARGET_FPS % GetSpriteCount(sprite));
                     return {frame, sprite};
                 case Direction::UP:
-                    sprite = GetBySpriteID(SPRITE_ID::Medusa_Idle_Back);
+                    sprite = GetSprite(SPRITE_ID::Medusa_Idle_Back);
                     frame = (int) (*ticks_total * sprite->framerate / TARGET_FPS % GetSpriteCount(sprite));
                     return {frame, sprite};
                 case Direction::DOWN:
-                    sprite = GetBySpriteID(SPRITE_ID::Medusa_Idle_Front);
+                    sprite = GetSprite(SPRITE_ID::Medusa_Idle_Front);
                     frame = (int) (*ticks_total * sprite->framerate / TARGET_FPS % GetSpriteCount(sprite));
                     return {frame, sprite};
             }
-            return GetBySpriteID(SPRITE_ID::Fallback);
+            return GetSprite(SPRITE_ID::Fallback);
         }
         case ENTITY_ID::GNOME: {
-            Sprite* sprite = GetBySpriteID(SPRITE_ID::Gnome_Rotate);
+            Sprite* sprite = GetSprite(SPRITE_ID::Gnome_Rotate);
             switch (entity->facing_current) {
                 case Direction::RIGHT:
                     return {1, sprite, true};
@@ -169,19 +170,19 @@ SpriteRenderInfo SpriteLibrary::GetSprite_FromEntityState( const Entity* entity,
                 case Direction::UP:
                     return {2, sprite};
             }
-            return GetBySpriteID(SPRITE_ID::Fallback);
+            return GetSprite(SPRITE_ID::Fallback);
         }
         case ENTITY_ID::GOLEM:
-            return GetBySpriteID(SPRITE_ID::Golem);
+            return GetSprite(SPRITE_ID::Golem);
         case ENTITY_ID::ROCK:
-            return GetBySpriteID(SPRITE_ID::Rock);
+            return GetSprite(SPRITE_ID::Rock);
         default:
-            return GetBySpriteID(SPRITE_ID::Fallback);
+            return GetSprite(SPRITE_ID::Fallback);
     }
-    return GetBySpriteID(SPRITE_ID::Fallback);
+    return GetSprite(SPRITE_ID::Fallback);
 }
 
-Sprite* SpriteLibrary::GetBySpriteID( SPRITE_ID id ) const {
+Sprite* SpriteLibrary::GetSprite( SPRITE_ID id ) const {
     Sprite* s = sprites[(int) id];
     return s && s->texture ? s : sprites[(int) SPRITE_ID::Fallback];
 }

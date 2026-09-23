@@ -22,22 +22,22 @@ namespace EDITOR {
     void DrawObjectPanel( Editor* editor, SpriteLibrary& sprites ) {
         ImGui::Begin("objects");
         ImVec2 size = {32, 32};
-        if (SpriteButton("Rock", sprites.Get(ENTITY_ID::ROCK), size)) {
+        if (SpriteButton("Rock", sprites.GetSprite(ENTITY_ID::ROCK), size)) {
             editor->object_to_place_id = ENTITY_ID::ROCK;
             editor->has_selection = true;
         }
         ImGui::SameLine();
-        if (SpriteButton("Gnome", sprites.Get(ENTITY_ID::GNOME), size)) {
+        if (SpriteButton("Gnome", sprites.GetSprite(ENTITY_ID::GNOME), size)) {
             editor->object_to_place_id = ENTITY_ID::GNOME;
             editor->has_selection = true;
         }
         ImGui::SameLine();
-        if (SpriteButton("Golem", sprites.Get(ENTITY_ID::GOLEM), size)) {
+        if (SpriteButton("Golem", sprites.GetSprite(ENTITY_ID::GOLEM), size)) {
             editor->object_to_place_id = ENTITY_ID::GOLEM;
             editor->has_selection = true;
         }
         ImGui::SameLine();
-        if (SpriteButton("Medusa", sprites.Get(ENTITY_ID::MEDUSA), size)) {
+        if (SpriteButton("Medusa", sprites.GetSprite(ENTITY_ID::MEDUSA), size)) {
             editor->object_to_place_id = ENTITY_ID::MEDUSA;
             editor->has_selection = true;
         }
@@ -57,7 +57,7 @@ namespace EDITOR {
         int x;
         int y;
         camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level, camera->camera_z);
-        SpriteRenderInfo preview = sprites.Get(editor->object_to_place_id);
+        SpriteRenderInfo preview = sprites.GetSprite(editor->object_to_place_id);
         if (preview.sprite == nullptr || !editor->has_selection) {
             return;
         }
