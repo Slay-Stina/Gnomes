@@ -12,11 +12,10 @@ set(DIR_ASSETS_DESTINATION $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets)
 
 find_package(SDL3 REQUIRED)
 find_package(SDL3_image REQUIRED)
+find_package(SDL3_ttf REQUIRED)
 
 # Flag executable specific files
-set(EXE_EXCLUSIVE ${CMAKE_SOURCE_DIR}/src/main.cpp
-        src/main.cpp
-)
+set(EXE_EXCLUSIVE ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
 # Flag files that both our executable and shared library need to know about
 set(SHARED_SOURCES
@@ -29,7 +28,7 @@ set(SHARED_LIB_NAME ${PROJECT_NAME}_common)
 # SHARED STATIC LIBRARY
 add_library(${SHARED_LIB_NAME} STATIC ${SHARED_SOURCES})
 target_include_directories(${SHARED_LIB_NAME} PRIVATE include)
-target_link_libraries(${SHARED_LIB_NAME} PRIVATE SDL3::SDL3 SDL3_image::SDL3_image)
+target_link_libraries(${SHARED_LIB_NAME} PRIVATE SDL3::SDL3 SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf)
 set_target_properties(${SHARED_LIB_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 # Alla .cpp-filer i src/
@@ -58,7 +57,7 @@ set_target_properties(${LIB_NAME} PROPERTIES
         BUILD_RPATH ${FMOD_LIB_DIR}
         INSTALL_RPATH ${FMOD_LIB_DIR})
 target_include_directories(${LIB_NAME} PRIVATE include)
-target_link_libraries(${LIB_NAME} PRIVATE SDL3::SDL3 ${SHARED_LIB_NAME} jsoncpp imgui)
+target_link_libraries(${LIB_NAME} PRIVATE ${SHARED_LIB_NAME} SDL3::SDL3 jsoncpp imgui)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${DIR_ASSETS_ORIGIN} ${DIR_ASSETS_DESTINATION}

@@ -2,6 +2,33 @@
 
 #include "button.h"
 #include "common.h"
+#include "FontAtlas.h"
+
+static const char STOP_CHAR = '\0';
+
+void RenderText( FontAtlas* atlas, const char* text, SDL_Renderer* renderer, Camera* camera, const float x,
+                 const float y, Alignment mode ) {
+    assert(atlas->atlasTexture != nullptr);
+    float draw_position_x = x;
+    float draw_position_y = y;
+    if (camera != nullptr) {
+        draw_position_x -= camera->camera_x;
+        draw_position_y -= camera->camera_y;
+    }
+    if (mode == Alignment::Centered) {
+        float totalWidth = 0;
+        for (int i = 0; text[i] != STOP_CHAR; i++) {
+            totalWidth += atlas->GetGlyph(text[i]).atlasPosition.w;
+        }
+        draw_position_x -= totalWidth / 2.0;
+    }
+    for (int i = 0; text[i] != STOP_CHAR; i++) {
+        Glyph glyph = atlas->GetGlyph(text[i]);
+        SDL_FRect renderRectangle = {draw_position_x, draw_position_y, glyph.atlasPosition.w, glyph.atlasPosition.h};
+        SDL_RenderTexture(renderer, atlas->atlasTexture, &glyph.atlasPosition, &renderRectangle);
+        draw_position_x += glyph.atlasPosition.w;
+    }
+}
 
 void RenderButton( Button* button, bool is_selected, SDL_Renderer* renderer ) {
     SDL_Texture* texture = button->texture;

@@ -13,9 +13,9 @@ void Menu::Initialize( MainMenu* mainmenu, SpriteLibrary* sprites, Arena* arena_
     mainmenu->buttons_count = 2;
     mainmenu->buttons = ALLOC_ARRAY(arena_main, Button, mainmenu->buttons_count);
 
-    SetupButton(&mainmenu->buttons[0], sprites, ButtonType::START_GAME, ButtonMode::Centered,
+    SetupButton(&mainmenu->buttons[0], sprites, ButtonType::START_GAME, Alignment::Centered,
                 {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f, 200, 80});
-    SetupButton(&mainmenu->buttons[1], sprites, ButtonType::QUIT, ButtonMode::Centered,
+    SetupButton(&mainmenu->buttons[1], sprites, ButtonType::QUIT, Alignment::Centered,
                 {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f + 100, 200, 80});
 
     mainmenu->activeButtonIndex = 0;

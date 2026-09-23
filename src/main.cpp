@@ -8,11 +8,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <dlfcn.h>
-#include <fstream>
 #include <unistd.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_timer.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -187,6 +187,7 @@ int main() {
     }
 
     SDL_Setup();
+    TTF_Init();
 
     dll.Initialize(gameData, window, renderer);
 
