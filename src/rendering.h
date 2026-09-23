@@ -4,6 +4,15 @@
 #include "levels.h"
 
 struct Button;
+struct FontAtlas;
+
+enum class Alignment {
+    Right,
+    Centered
+};
+
+void RenderText( FontAtlas* atlas, const char* text, SDL_Renderer* renderer, Camera* camera, float x,
+                 float y, Alignment alignment );
 
 void RenderButton( Button* button, bool is_selected, SDL_Renderer* renderer );
 

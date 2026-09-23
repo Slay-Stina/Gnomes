@@ -7,6 +7,7 @@
 #include <imgui.h>
 
 #include "audioSystem.h"
+#include "FontAtlas.h"
 #include "game.h"
 #include "levelEditor.h"
 #include "mainmenu.h"
@@ -67,6 +68,7 @@ struct GameData {
     EditorData editor_data;
     Input input;
     SpriteLibrary sprites;
+    FontAtlas font;
     Tileset* tilesetBuffer;
     Arena* arena_main;
     Arena* arena_levels;

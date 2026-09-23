@@ -5,6 +5,7 @@
 #include "collision.h"
 #include "core.h"
 #include "gameState.h"
+#include "rendering.h"
 
 void PressButton( GameData* data, Button* button ) {
     if (button == nullptr)
@@ -42,12 +43,12 @@ bool IsHoveredOver( Button* button, float x, float y ) {
     return CheckCollisionInsideBounds(button->rect, x, y);
 }
 
-void SetupButton( Button* button, SpriteLibrary* sprites, ButtonType type, ButtonMode mode, SDL_FRect rect ) {
+void SetupButton( Button* button, SpriteLibrary* sprites, ButtonType type, Alignment mode, SDL_FRect rect ) {
     assert(type != ButtonType::NONE);
     button->type = type;
     button->mode = mode;
     button->rect = rect;
-    if (button->mode == ButtonMode::Centered) {
+    if (button->mode == Alignment::Centered) {
         button->rect.x -= rect.w / 2;
         button->rect.y -= rect.h / 2;
     }

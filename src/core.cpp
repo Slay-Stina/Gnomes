@@ -58,6 +58,8 @@ void DrawScene( GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer ) {
         }
         case SCENE_TYPES::MAINMENU:
             Menu::Draw(&data->scenes.mainMenu, renderer, &data->sprites, &data->input);
+            RenderText(&data->font, "GNOMES", renderer, &data->camera, SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 4.0,
+                       Alignment::Centered);
             break;
         case SCENE_TYPES::GAME:
             Game::Draw(data, renderer);
@@ -78,6 +80,7 @@ void Initialize( GameData* data, SDL_Window* window, SDL_Renderer* renderer ) {
     Audio::Initialize(&data->audio, data->arena_main);
     AssetManagement::LoadAllSFX(&data->audio);
     data->sprites.LoadAll(renderer, data->arena_images);
+    data->font.LoadFont(renderer, "assets/fonts/ByteBounce.ttf", 48);
     AssetManagement::LoadAllTilesets(data->tilesetBuffer, data->arena_images);
     data->imGui_context = ImGui::GetCurrentContext();
     SDL_Texture* blackfade = data->sprites.GetBySpriteID(SPRITE_ID::black_1x1)->texture;
