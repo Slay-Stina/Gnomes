@@ -26,7 +26,7 @@ static int load_counter = 0;
 
 typedef void ( *Function_Initialize )( GameData* data, SDL_Window* window, SDL_Renderer* renderer );
 
-typedef bool ( *Function_HandleEvents )( Arena* arena, SDL_Event event );
+typedef bool ( *Function_HandleEvents )( Arena* arena, SDL_Event& event );
 
 typedef void ( *Function_Update )( GameData* data, float dt );
 
